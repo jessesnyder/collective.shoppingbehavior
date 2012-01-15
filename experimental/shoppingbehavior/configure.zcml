@@ -13,6 +13,5 @@
       description="Installs the experimental.shoppingbehavior package"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
-  <!-- -*- extra stuff goes here -*- -->
-  
+
 </configure>
