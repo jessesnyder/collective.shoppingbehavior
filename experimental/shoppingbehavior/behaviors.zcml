@@ -18,6 +18,14 @@
   <!-- utility adapter for managing status of pricing behavior -->
   <adapter factory=".behaviors.PricingStatus" />
 
+  <browser:page
+    for="*"
+    name="pricing"
+    class=".behaviors.PricingStatusView"
+    allowed_interface=".behaviors.IPricingStatus"
+    permission="cmf.ModifyPortalContent"
+   />
+
   <plone:behavior
       title="Pricing"
       description="Store a price for the adapted item"

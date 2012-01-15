@@ -1,8 +1,14 @@
 import unittest2 as unittest
+from zope.interface import implements
 from zope.component import queryUtility
 from plone.behavior.interfaces import IBehavior
+from zope.annotation.interfaces import IAttributeAnnotatable
 
 from experimental.shoppingbehavior.testing import EXP_SHOPPING_INTEGRATION_TESTING
+
+
+class SomeContext(object):
+    implements(IAttributeAnnotatable)
 
 
 class TestConfiguration(unittest.TestCase):

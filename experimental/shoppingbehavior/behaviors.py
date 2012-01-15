@@ -69,6 +69,51 @@ class PricingStatus(object):
         annotations[KEY] = instance_behaviors
 
 
+class PricingStatusView(BrowserView):
+    """ Configuration/utility view for enabling and disabling pricing """
+
+    behavior_name = 'wacdl.payments.behaviors.IPriced'
+
+    @view.memoize
+    def isPriceEnableable(self):
+        """ See interface definition """
+        context = aq_inner(self.context)
+        if not IPotentiallyPriced.providedBy(context):
+            return False
+        return not self.isPriceEnabled()
+
+    @view.memoize
+    def isPriceEnabled(self):
+        """ See interface definition """
+        context = aq_inner(self.context)
+        if not IPotentiallyPriced.providedBy(context):
+            return False
+        config = IPricingStatus(context)
+        return config.isPriceEnabled()
+
+    def enablePricing(self):
+        """ See interface definition """
+        context = aq_inner(self.context)
+        config = IPricingStatus(context)
+        config.enablePricing()
+        IStatusMessage(self.request).add(
+            _(u"Pricing has been enabled for this object."),
+              u"info")
+        self.request.RESPONSE.redirect(context.absolute_url())
+        return ''
+
+    def disablePricing(self):
+        """ See interface definition """
+        context = aq_inner(self.context)
+        config = IPricingStatus(context)
+        config.disablePricing()
+        IStatusMessage(self.request).add(
+            _(u"Pricing has been disabled for this object."),
+              u"info")
+        self.request.RESPONSE.redirect(context.absolute_url())
+        return ''
+
+
 class DexterityInstanceBehaviorAssignable(DexterityBehaviorAssignable):
     """ Support per instance specification of plone.behavior behaviors
     """
@@ -80,7 +125,7 @@ class DexterityInstanceBehaviorAssignable(DexterityBehaviorAssignable):
         self.instance_behaviors = annotations.get(KEY, ())
 
     def enumerateBehaviors(self):
-        self.behaviors = self.fti.behaviors + list(self.instance_behaviors)
+        self.behaviors = self.fti.behaviors + self.instance_behaviors
         for name in self.behaviors:
             behavior = queryUtility(IBehavior, name=name)
             if behavior is not None:
