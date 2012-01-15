@@ -5,6 +5,10 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="experimental.shoppingbehavior">
 
+  <!-- Include dependencies' configuration -->
+  <includeDependencies package="." />
+
+  <include file="behaviors.zcml" />
 
   <genericsetup:registerProfile
       name="default"
