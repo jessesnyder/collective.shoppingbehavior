@@ -1,5 +1,5 @@
-Introduction
-============
+experimental.shoppingbehavior
+=============================
 
 This document contains design notes for the ``experimental.shoppingbehavior``
 package.
