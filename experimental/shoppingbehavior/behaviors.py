@@ -139,7 +139,7 @@ class IPriced(form.Schema):
     form.fieldset(
             'pricing',
             label=u'Pricing',
-            fields=('payable', 'price',),
+            fields=('price',),
         )
     price = schema.Float(
         title=u'Price',
