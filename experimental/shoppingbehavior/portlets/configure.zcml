@@ -1,0 +1,14 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone">
+
+    <include package="plone.app.portlets" />
+
+    <plone:portlet
+        name="experimental.shoppingbehavior"
+        interface=".shopping.IShoppingPortlet"
+        assignment=".shopping.Assignment"
+        renderer=".shopping.Renderer"
+        addview=".shopping.AddForm"
+    />
+</configure>

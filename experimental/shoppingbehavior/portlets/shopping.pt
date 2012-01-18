@@ -1,0 +1,43 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      tal:omit-tag="">
+<dl class="portlet portletShopping"
+    i18n:domain="plone">
+
+    <dt class="portletHeader">
+        <span class="portletTopLeft"></span>
+        <a href="#"
+            i18n:translate=""
+            tal:content="string:Heading!" />
+        <span class="portletTopRight"></span>
+    </dt>
+
+    <tal:items tal:define="plone_view context/@@plone;
+                           getIcon nocall:plone_view/getIcon;
+                           normalizeString nocall:plone_view/normalizeString;
+                           toLocalizedTime nocall:plone_view/toLocalizedTime;">
+
+        <dd class="portletItem">
+            <a href="">An item.
+            </a>
+        </dd>
+    </tal:items>
+
+    <dd class="portletItem"
+        tal:condition="python: False"
+        i18n:translate="box_recent_no_items">
+        No items in your cart.
+    </dd>
+
+    <dd class="portletFooter">
+        <a href="#"
+           class="tile">
+           View cart&hellip;
+        </a>
+        <span class="portletBottomLeft"></span>
+        <span class="portletBottomRight"></span>
+    </dd>
+
+</dl>
+</html>
