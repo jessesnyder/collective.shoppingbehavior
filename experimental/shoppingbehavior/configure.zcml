@@ -9,6 +9,7 @@
   <includeDependencies package="." />
 
   <include file="behaviors.zcml" />
+  <include package=".portlets" />
 
   <genericsetup:registerProfile
       name="default"
