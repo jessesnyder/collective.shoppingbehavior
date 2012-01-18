@@ -2,39 +2,51 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       tal:omit-tag="">
-<dl class="portlet portletShopping"
-    i18n:domain="plone">
+    <dl class="portlet" id="portlet-cart">
 
     <dt class="portletHeader">
         <span class="portletTopLeft"></span>
-        <a href="#"
-            i18n:translate=""
-            tal:content="string:Heading!" />
+        <span class="portletTopMiddle"
+          i18n:translate="text_product_details">Product Details</span>
         <span class="portletTopRight"></span>
     </dt>
 
-    <tal:items tal:define="plone_view context/@@plone;
-                           getIcon nocall:plone_view/getIcon;
-                           normalizeString nocall:plone_view/normalizeString;
-                           toLocalizedTime nocall:plone_view/toLocalizedTime;">
+    <dd class="portletItem odd">
+      <div>
 
-        <dd class="portletItem">
-            <a href="">An item.
-            </a>
-        </dd>
-    </tal:items>
+        <p class="productTitle"
+           tal:define="field context/Title"
+           tal:condition="field"
+           tal:content="field">[Title]
+        </p>
 
-    <dd class="portletItem"
-        tal:condition="python: False"
-        i18n:translate="box_recent_no_items">
-        No items in your cart.
+        <p class="productDescription"
+           tal:define="field context/Description"
+           tal:condition="field"
+           tal:content="field" >[Description]
+        </p>
+
+        <p class="productPrice"
+           tal:define="field python: '%.2f' % view.price()"
+           tal:condition="field"
+       i18n:translate="text_price">
+             Price: <span i18n:name="value_currency"
+                          tal:content="view/currency" />
+             <span tal:content="field" i18n:name="value_price" />
+        </p>
+
+      </div>
     </dd>
 
     <dd class="portletFooter">
-        <a href="#"
-           class="tile">
-           View cart&hellip;
-        </a>
+        <form tal:attributes= "action string:${context/absolute_url}/@@xsb-cart-add"
+              method="post">
+          <input type="hidden" name="add_item" value="True" />
+          <input type="text" size="1" name="quantity" value="1" />
+          <input type="submit"
+                 i18n:attributes="value label_add_to_cart"
+                 value="Add to Cart" />
+        </form>
         <span class="portletBottomLeft"></span>
         <span class="portletBottomRight"></span>
     </dd>

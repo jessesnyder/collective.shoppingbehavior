@@ -23,15 +23,24 @@ class Renderer(base.Renderer):
 
     def __init__(self, context, request, view, manager, data):
         base.Renderer.__init__(self, context, request, view, manager, data)
+        self.status = behaviors.IPricingStatus(self.context)
         # TODO: do we need init?
 
     @property
     def available(self):
-        status = behaviors.IPricingStatus(self.context)
-        return status.isPriceEnabled()
+        return self.status.isPriceEnabled()
 
     def update(self):
         pass
+
+    def price(self):
+        priced = behaviors.IPriced(self.context, None)
+        if priced is None:
+            return 0.0
+        return priced.price
+
+    def currency(self):
+        return u"$"
 
     render = ViewPageTemplateFile('shopping.pt')
 
