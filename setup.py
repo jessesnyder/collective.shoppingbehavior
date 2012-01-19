@@ -28,7 +28,7 @@ setup(name='experimental.shoppingbehavior',
       'Products.CMFPlone',
     ],
     extras_require={
-      'test': ['plone.app.testing', ]
+      'test': ['plone.app.testing', 'mock']
     },
     entry_points="""
     # -*- Entry points: -*-
