@@ -15,13 +15,13 @@
       <div>
 
         <p class="productTitle"
-           tal:define="field context/Title"
+           tal:define="field view/title"
            tal:condition="field"
            tal:content="field">[Title]
         </p>
 
         <p class="productDescription"
-           tal:define="field context/Description"
+           tal:define="field view/description"
            tal:condition="field"
            tal:content="field" >[Description]
         </p>

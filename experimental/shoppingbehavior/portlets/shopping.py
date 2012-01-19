@@ -3,6 +3,7 @@ from zope.interface import implements
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from plone.app.portlets.portlets import base
+from getpaid.core.interfaces import IPayableLineItem
 
 from experimental.shoppingbehavior import _
 from experimental.shoppingbehavior import behaviors
@@ -24,6 +25,7 @@ class Renderer(base.Renderer):
     def __init__(self, context, request, view, manager, data):
         base.Renderer.__init__(self, context, request, view, manager, data)
         self.status = behaviors.IPricingStatus(self.context)
+        self.payable = IPayableLineItem(self.context)
         # TODO: do we need init?
 
     @property
@@ -34,10 +36,13 @@ class Renderer(base.Renderer):
         pass
 
     def price(self):
-        priced = behaviors.IPriced(self.context, None)
-        if priced is None:
-            return 0.0
-        return priced.price
+        return self.payable.cost
+
+    def title(self):
+        return self.payable.name
+
+    def description(self):
+        return self.payable.description
 
     def currency(self):
         return u"$"
