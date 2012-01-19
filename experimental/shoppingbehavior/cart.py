@@ -1,5 +1,6 @@
 from five import grok
 from Acquisition import aq_inner
+from plone.uuid.interfaces import IUUID
 from getpaid.core.interfaces import IPayableLineItem
 from groundwire.checkout.utils import get_cart
 from groundwire.checkout.utils import redirect_to_checkout
@@ -8,19 +9,31 @@ from experimental.shoppingbehavior import behaviors
 
 
 class DefaultLineItemAdapter(grok.Adapter):
+    """ The IPayableLineItem adapter lookup is used both by the portlet
+        for adding items to the cart, and during payment processing
+    """
     grok.context(behaviors.IPotentiallyPriced)
     grok.provides(IPayableLineItem)
 
-    def __init__(self, buyable):
-        self.cost = behaviors.IPriced(buyable).price
-        self.item_id = buyable.id
-        self.name = buyable.title
-        self.description = buyable.description
+    def __init__(self, context):
+        self.context = context
+        # This lookup will fail if the context doesn't actually have the
+        # behavior enabled.
+        self.cost = behaviors.IPriced(self.context).price
+        self.item_id = self.context.id
+        self.name = self.context.title
+        self.description = self.context.description
         self.quantity = 0
+        self.uid = IUUID(self.context)
+
+    def after_charged(self):
+        pass
 
 
 class Cart(object):
-    """ Responsible for adding items to the shopping cart """
+    """ Responsible for adding items to the shopping cart and knowing where
+        the checkout form lives
+    """
 
     def add(self, obj, qty):
         lineitem = IPayableLineItem(obj, None)
@@ -38,7 +51,7 @@ class Cart(object):
 
 
 class CartView(grok.View):
-    """ Add the context object to the shopping cart if possible.
+    """ Adds the context object to the shopping cart if possible.
     """
     grok.name('xsb-cart-add')
     grok.context(behaviors.IPotentiallyPriced)
