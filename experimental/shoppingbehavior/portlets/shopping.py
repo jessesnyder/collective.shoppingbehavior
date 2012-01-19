@@ -24,12 +24,12 @@ class Renderer(base.Renderer):
 
     def __init__(self, context, request, view, manager, data):
         base.Renderer.__init__(self, context, request, view, manager, data)
-        self.status = behaviors.IPricingStatus(self.context)
-        self.payable = IPayableLineItem(self.context)
+        self.status = behaviors.IPricingStatus(self.context, None)
+        self.payable = IPayableLineItem(self.context, None)
 
     @property
     def available(self):
-        return self.status.isPriceEnabled()
+        return self.status is not None and self.status.isPriceEnabled()
 
     def update(self):
         pass
