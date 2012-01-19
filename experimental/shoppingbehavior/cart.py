@@ -2,32 +2,43 @@ from five import grok
 from Acquisition import aq_inner
 from plone.uuid.interfaces import IUUID
 from getpaid.core.interfaces import IPayableLineItem
+from getpaid.core.item import PayableLineItem
 from groundwire.checkout.utils import get_cart
 from groundwire.checkout.utils import redirect_to_checkout
 
 from experimental.shoppingbehavior import behaviors
 
 
-class DefaultLineItemAdapter(grok.Adapter):
+class ICallbackLineItem(IPayableLineItem):
+    """ A line item with an after_charged() callback for use with
+        groundwire.checkout
+    """
+    def after_charged():
+        """ This method will be called by the groundwire.checkout payment
+            transaction machinery if defined.
+        """
+
+
+class CallbackLineItem(PayableLineItem):
+    def after_charged(self):
+        pass
+
+
+@grok.implementer(ICallbackLineItem)
+@grok.adapter(behaviors.IPotentiallyPriced)
+def defaultLineItemAdapter(context):
     """ The IPayableLineItem adapter lookup is used both by the portlet
         for adding items to the cart, and during payment processing
     """
-    grok.context(behaviors.IPotentiallyPriced)
-    grok.provides(IPayableLineItem)
+    item = CallbackLineItem()
+    item.cost = behaviors.IPriced(context).price
+    item.item_id = context.id
+    item.name = context.title
+    item.description = context.description
+    item.quantity = 0
+    item.uid = IUUID(context)
 
-    def __init__(self, context):
-        self.context = context
-        # This lookup will fail if the context doesn't actually have the
-        # behavior enabled.
-        self.cost = behaviors.IPriced(self.context).price
-        self.item_id = self.context.id
-        self.name = self.context.title
-        self.description = self.context.description
-        self.quantity = 0
-        self.uid = IUUID(self.context)
-
-    def after_charged(self):
-        pass
+    return item
 
 
 class Cart(object):
@@ -36,7 +47,7 @@ class Cart(object):
     """
 
     def add(self, obj, qty):
-        lineitem = IPayableLineItem(obj, None)
+        lineitem = ICallbackLineItem(obj, None)
         if lineitem is None:
             return False
         lineitem.quantity = qty

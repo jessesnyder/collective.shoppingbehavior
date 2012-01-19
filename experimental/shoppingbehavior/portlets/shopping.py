@@ -26,7 +26,6 @@ class Renderer(base.Renderer):
         base.Renderer.__init__(self, context, request, view, manager, data)
         self.status = behaviors.IPricingStatus(self.context)
         self.payable = IPayableLineItem(self.context)
-        # TODO: do we need init?
 
     @property
     def available(self):
