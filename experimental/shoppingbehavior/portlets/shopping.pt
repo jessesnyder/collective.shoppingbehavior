@@ -27,12 +27,12 @@
         </p>
 
         <p class="productPrice"
-           tal:define="field python: '%.2f' % view.price()"
-           tal:condition="field"
+           tal:define="price python: '%.2f' % view.price"
+           tal:condition="price"
        i18n:translate="text_price">
              Price: <span i18n:name="value_currency"
                           tal:content="view/currency" />
-             <span tal:content="field" i18n:name="value_price" />
+             <span tal:content="price" i18n:name="value_price" />
         </p>
 
       </div>

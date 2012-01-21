@@ -1,7 +1,11 @@
 from five import grok
 from Acquisition import aq_inner
+from zope.component import queryMultiAdapter
 from plone.uuid.interfaces import IUUID
+from Products.CMFPlone.utils import safe_unicode
 from getpaid.core.interfaces import IPayableLineItem
+from getpaid.core.interfaces import ILineItemFactory
+from getpaid.core.interfaces import IShoppingCart
 from getpaid.core.item import PayableLineItem
 from groundwire.checkout.utils import get_cart
 from groundwire.checkout.utils import redirect_to_checkout
@@ -24,40 +28,55 @@ class CallbackLineItem(PayableLineItem):
         pass
 
 
-@grok.implementer(ICallbackLineItem)
-@grok.adapter(behaviors.IPotentiallyPriced)
-def defaultLineItemAdapter(context):
-    """ The IPayableLineItem adapter lookup is used both by the portlet
-        for adding items to the cart, and during payment processing
+class CallbackLineItemFactory(grok.MultiAdapter):
+    """ Responsible for generating a LineItem for a buyable object and adding
+        it to the cart.
     """
-    priced = behaviors.IPriced(context, None)
-    if priced is None:
-        return None
-    item = CallbackLineItem()
-    item.cost = behaviors.IPriced(context).price
-    item.item_id = context.id
-    item.name = context.title
-    item.description = context.description
-    item.quantity = 0
-    item.uid = IUUID(context)
+    grok.provides(ILineItemFactory)
+    grok.adapts(IShoppingCart, behaviors.IPotentiallyPriced)
 
-    return item
+    lineitemType = CallbackLineItem
+
+    def __init__(self, cart, item):
+        self.cart = cart
+        self.item = item
+        self.priced = behaviors.IPriced(self.item, None)
+
+    def create(self):
+        if self.priced is None:
+            return None
+        lineitem = self.lineitemType()
+        self._initLineitem(lineitem)
+        self._addToCart(lineitem)
+
+        return lineitem
+
+    def _addToCart(self, lineitem):
+        if lineitem.item_id in self.cart:
+            del self.cart[lineitem.item_id]
+        self.cart[lineitem.item_id] = lineitem
+
+    def _initLineitem(self, lineitem):
+        lineitem.cost = self.priced.price
+        lineitem.item_id = self.item.id
+        lineitem.name = safe_unicode(self.item.title)
+        lineitem.description = safe_unicode(self.item.description)
+        lineitem.quantity = 0
+        lineitem.uid = IUUID(self.item)
 
 
 class Cart(object):
-    """ Responsible for adding items to the shopping cart and knowing where
-        the checkout form lives
+    """ Responsible for knowing about the details of carts, lineitems and
+        checkout forms.
     """
 
     def add(self, obj, qty):
-        lineitem = ICallbackLineItem(obj, None)
-        if lineitem is None:
-            return False
-        lineitem.quantity = qty
         cart = get_cart()
-        if lineitem.item_id in cart:
-            del cart[lineitem.item_id]
-        cart[lineitem.item_id] = lineitem
+        lineitem_factory = queryMultiAdapter((cart, obj), ILineItemFactory)
+        if lineitem_factory is None:
+            return False
+        lineitem = lineitem_factory.create()
+        lineitem.quantity = qty
         return True
 
     def checkout(self):
