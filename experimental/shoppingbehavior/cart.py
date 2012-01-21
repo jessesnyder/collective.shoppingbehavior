@@ -30,6 +30,9 @@ def defaultLineItemAdapter(context):
     """ The IPayableLineItem adapter lookup is used both by the portlet
         for adding items to the cart, and during payment processing
     """
+    priced = behaviors.IPriced(context, None)
+    if priced is None:
+        return None
     item = CallbackLineItem()
     item.cost = behaviors.IPriced(context).price
     item.item_id = context.id
