@@ -69,10 +69,11 @@ class Cart(object):
     """ Responsible for knowing about the details of carts, lineitems and
         checkout forms.
     """
+    def __init__(self, cart):
+        self.cart = cart or get_cart()
 
     def add(self, obj, qty):
-        cart = get_cart()
-        lineitem_factory = queryMultiAdapter((cart, obj), ILineItemFactory)
+        lineitem_factory = queryMultiAdapter((self.cart, obj), ILineItemFactory)
         if lineitem_factory is None:
             return False
         lineitem = lineitem_factory.create()
