@@ -1,5 +1,6 @@
 from plone.portlets.interfaces import IPortletDataProvider
 from zope.interface import implements
+from zope.cachedescriptors.property import Lazy as lazy_property
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from plone.app.portlets.portlets import base
@@ -21,21 +22,19 @@ class Assignment(base.Assignment):
 
 class Renderer(base.Renderer):
 
-    def __init__(self, context, request, view, manager, data):
-        base.Renderer.__init__(self, context, request, view, manager, data)
-        self.status = behaviors.IPricingStatus(self.context, None)
-
     @property
     def available(self):
-        return self.status is not None and self.status.isPriceEnabled() \
-            and self.price is not None
+        if self.priced is not None and self.priced.price is not None:
+            return self.priced.enabled
+        return False
 
-    def update(self):
-        pass
+    @lazy_property
+    def priced(self):
+        return behaviors.IPriced(self.context, None)
 
     @property
     def price(self):
-        return behaviors.IPriced(self.context).price
+        self.priced.price
 
     @property
     def title(self):

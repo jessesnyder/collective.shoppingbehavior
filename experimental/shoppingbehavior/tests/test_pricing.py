@@ -7,7 +7,6 @@ from zope.component import queryUtility
 from zope.component import provideAdapter
 from zope.interface import Interface
 from zope.interface import implements
-from zope.interface import alsoProvides
 from zope.annotation.interfaces import IAttributeAnnotatable
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.behavior.interfaces import IBehavior
@@ -79,53 +78,3 @@ class TestPricing(unittest.TestCase):
         # but you can assign and re-obtain the attributes
         priced.price = 2.99
         self.assertEqual(2.99, behaviors.IPriced(context).price)
-
-
-class TestPricingConfig(unittest.TestCase):
-    """ Test enabling and disabling pricing behavior """
-
-    layer = UNIT_TESTING
-
-    configuration = """\
-<configure
-    package="experimental.shoppingbehavior"
-    xmlns="http://namespaces.zope.org/zope"
-    xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="experimental.shoppingbehavior">
-
-  <include package="zope.component" file="meta.zcml" />
-  <include package="zope.annotation" />
-
-</configure>
-"""
-
-    def setUp(self):
-        xmlconfig.xmlconfig(StringIO(self.configuration))
-        provideAdapter(behaviors.PricingStatus)
-
-    def testAdapterLookupFailsWithoutSupportInterface(self):
-        context = SomeContext()
-        self.assertRaises(TypeError, behaviors.IPricingStatus, context)
-
-    def testAdapterLookupWithSupportInterface(self):
-        context = SomeContext()
-        alsoProvides(context, behaviors.IPotentiallyPriced)
-        config = behaviors.IPricingStatus(context)
-        self.assertTrue(config is not None)
-
-    def testIsPriceEnableable(self):
-        context = SomeContext()
-        alsoProvides(context, behaviors.IPotentiallyPriced)
-        config = behaviors.IPricingStatus(context)
-        self.assertTrue(config.isPriceEnableable())
-
-    def testEnableAndDisable(self):
-        context = SomeContext()
-        alsoProvides(context, behaviors.IPotentiallyPriced)
-        config = behaviors.IPricingStatus(context)
-        config.enablePricing()
-        self.failUnless(config.isPriceEnabled())
-        self.failIf(config.isPriceEnableable())
-        config.disablePricing()
-        self.failIf(config.isPriceEnabled())
-        self.failUnless(config.isPriceEnableable())
