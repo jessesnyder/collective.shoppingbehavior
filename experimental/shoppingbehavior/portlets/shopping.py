@@ -34,7 +34,7 @@ class Renderer(base.Renderer):
 
     @property
     def price(self):
-        self.priced.price
+        return self.priced.price
 
     @property
     def title(self):

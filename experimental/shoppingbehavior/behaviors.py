@@ -12,9 +12,15 @@ class IPriced(form.Schema):
     form.fieldset(
             'pricing',
             label=u'Pricing',
-            fields=('price',),
+            fields=('enabled', 'price',),
         )
-    price = schema.Float(
+    enabled = schema.Bool(
+        title=u'Enabled',
+        description=u'Enable pricing for this item',
+        default=False,
+        required=False,
+    )
+    price = schema.Decimal(
         title=u'Price',
         description=u'The price for this item',
         required=False,
