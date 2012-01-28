@@ -1,8 +1,13 @@
 from zope.interface import alsoProvides
-
+from zope.interface import Interface
 from zope import schema
-
 from plone.directives import form
+
+
+class IPotentiallyPriced(Interface):
+    """ Marker interface for content types that can have pricing enabled. This
+        interface on type for which the IPriced behavior is enabled.
+    """
 
 
 class IPriced(form.Schema):

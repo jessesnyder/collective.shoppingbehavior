@@ -33,7 +33,7 @@ class CallbackLineItemFactory(grok.MultiAdapter):
         it to the cart.
     """
     grok.provides(ILineItemFactory)
-    grok.adapts(IShoppingCart, behaviors.IPriced)
+    grok.adapts(IShoppingCart, behaviors.IPotentiallyPriced)
 
     lineitemType = CallbackLineItem
 
@@ -88,7 +88,7 @@ class CartView(grok.View):
     """ Adds the context object to the shopping cart if possible.
     """
     grok.name('xsb-cart-add')
-    grok.context(behaviors.IPriced)
+    grok.context(behaviors.IPotentiallyPriced)
     grok.require('zope2.View')
 
     def update(self):

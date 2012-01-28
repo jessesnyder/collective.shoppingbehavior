@@ -16,6 +16,7 @@
       title="Pricing"
       description="Store a price for the adapted item"
       provides=".behaviors.IPriced"
+      marker=".behaviors.IPotentiallyPriced"
       factory="plone.behavior.AnnotationStorage" />
 
 </configure>
