@@ -7,6 +7,7 @@ from zope.component import queryUtility
 from zope.component import provideAdapter
 from zope.interface import Interface
 from zope.interface import implements
+from zope.interface import Invalid
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.behavior.interfaces import IBehavior
 
@@ -86,3 +87,13 @@ class TestPricing(unittest.TestCase):
         # but you can assign and re-obtain the attributes
         priced.price = 2.99
         self.assertEqual(2.99, behaviors.IPriced(context).price)
+
+    def testInvariants(self):
+        validation = behaviors.IPriced.validateInvariants
+        context = StubContext()
+        priced = behaviors.IPriced(context)
+        priced.enabled = True
+        self.assertRaises(Invalid, validation, priced)
+        # set a price and we're OK
+        priced.price = 2.99
+        self.assertEqual(None, validation(priced))
