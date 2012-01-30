@@ -29,6 +29,11 @@ class TestCart(unittest.TestCase):
 
 
 class TestCartView(unittest.TestCase):
+    """ The CartView instantiates a Cart object and the calls its add() method
+        with the context object and the quantity pulled from the request. These
+        tests mock out the Cart class in order to test these interactions in
+        isolation.
+    """
 
     @fudge.patch('experimental.shoppingbehavior.cart.Cart')
     def testCartViewCallsWithZeroQtyByDefault(self, Cart):
