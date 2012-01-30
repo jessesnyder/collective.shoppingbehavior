@@ -29,7 +29,6 @@ class TestCart(unittest.TestCase):
 
 
 class TestCartView(unittest.TestCase):
-    """docstring for TestCartView"""
 
     @fudge.patch('experimental.shoppingbehavior.cart.Cart')
     def testCartViewCallsWithZeroQtyByDefault(self, Cart):
@@ -53,6 +52,19 @@ class TestCartView(unittest.TestCase):
                                  .with_args(context, int(testQty))
                                  .returns('some id'))
         fakeCartInstance.expects('checkout')
+        Cart.expects_call().returns(fakeCartInstance)
+        view = cart.CartView(context, request)
+        view.update()
+
+    @fudge.patch('experimental.shoppingbehavior.cart.Cart')
+    def testOnlyCallsCheckoutIfAddSucceeds(self, Cart):
+        context = object()
+        testQty = '3'
+        request = TestRequest(form=dict(quantity=testQty))
+        fakeCartInstance = (fudge.Fake()
+                                 .provides('add')
+                                 .with_args(context, int(testQty))
+                                 .returns(False))
         Cart.expects_call().returns(fakeCartInstance)
         view = cart.CartView(context, request)
         view.update()
