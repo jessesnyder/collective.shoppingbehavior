@@ -7,21 +7,13 @@ from zope.component import queryUtility
 from zope.component import provideAdapter
 from zope.interface import Interface
 from zope.interface import implements
-from zope.annotation.interfaces import IAttributeAnnotatable
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.behavior.interfaces import IBehavior
 
 from experimental.shoppingbehavior import behaviors
+from experimental.shoppingbehavior.testing import StubContext
 
 from plone.testing.zca import UNIT_TESTING
-
-
-class SomeInterface(Interface):
-    pass
-
-
-class SomeContext(object):
-    implements(IAttributeAnnotatable)
 
 
 configuration = """\
@@ -71,12 +63,12 @@ class TestPricing(unittest.TestCase):
         provideAdapter(TestingAssignable)
 
     def testAdaptation(self):
-        context = SomeContext()
+        context = StubContext()
         priced = behaviors.IPriced(context)
         self.assertTrue(priced is not None)
 
     def testEnabled(self):
-        context = SomeContext()
+        context = StubContext()
         priced = behaviors.IPriced(context)
         self.assertTrue(hasattr(priced, 'enabled'))
         # should be false by default
@@ -86,7 +78,7 @@ class TestPricing(unittest.TestCase):
         self.assertEqual(True, behaviors.IPriced(context).enabled)
 
     def testPrice(self):
-        context = SomeContext()
+        context = StubContext()
         priced = behaviors.IPriced(context)
         self.assertTrue(hasattr(priced, 'price'))
         # starts with null price by default

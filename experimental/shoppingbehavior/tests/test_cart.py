@@ -1,13 +1,7 @@
 import unittest2 as unittest
 import fudge
-from zope.interface import implements
-from zope.annotation.interfaces import IAttributeAnnotatable
-from experimental.shoppingbehavior import cart
 from zope.publisher.browser import TestRequest
-
-
-class SomeContext(object):
-    implements(IAttributeAnnotatable)
+from experimental.shoppingbehavior import cart
 
 
 class TestCart(unittest.TestCase):
@@ -39,7 +33,7 @@ class TestCartView(unittest.TestCase):
 
     @fudge.patch('experimental.shoppingbehavior.cart.Cart')
     def testCartViewCallsWithZeroQtyByDefault(self, Cart):
-        context = SomeContext()
+        context = object()
         fakeCartInstance = (fudge.Fake()
                                  .provides('add')
                                  .with_args(context, 0)
@@ -51,7 +45,7 @@ class TestCartView(unittest.TestCase):
 
     @fudge.patch('experimental.shoppingbehavior.cart.Cart')
     def testCartViewCallsWithQtyFromRequest(self, Cart):
-        context = SomeContext()
+        context = object()
         testQty = '3'
         request = TestRequest(form=dict(quantity=testQty))
         fakeCartInstance = (fudge.Fake()
