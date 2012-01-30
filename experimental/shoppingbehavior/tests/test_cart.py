@@ -16,7 +16,7 @@ class TestCart(unittest.TestCase):
         fixture = cart.Cart()
         # set up a fake queryMultiAdapter chain of madness
         fakeLineItem = (fudge.Fake('LineItem')
-                            .has_attr(item_id="foo", quantity=0))
+                             .has_attr(item_id="foo", quantity=0))
         fakeLineItemFactory = (fudge.Fake('LineItemFactory')
                                     .provides('create')
                                     .returns(fakeLineItem))
