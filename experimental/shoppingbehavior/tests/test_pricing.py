@@ -2,12 +2,8 @@ import unittest2 as unittest
 from StringIO import StringIO
 
 from zope.configuration import xmlconfig
-from zope.component import adapts
-from zope.component import queryUtility
-from zope.component import provideAdapter
-from zope.interface import Interface
-from zope.interface import implements
-from zope.interface import Invalid
+from zope import component as cpt
+from zope import interface as zif
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.behavior.interfaces import IBehavior
 
@@ -40,8 +36,8 @@ configuration = """\
 
 
 class TestingAssignable(object):
-    implements(IBehaviorAssignable)
-    adapts(Interface)
+    zif.implements(IBehaviorAssignable)
+    cpt.adapts(zif.Interface)
     enabled = [behaviors.IPriced]
 
     def __init__(self, context):
@@ -52,7 +48,7 @@ class TestingAssignable(object):
 
     def enumerateBehaviors(self):
         for e in self.enabled:
-            yield queryUtility(IBehavior, name=e.__identifier__)
+            yield cpt.queryUtility(IBehavior, name=e.__identifier__)
 
 
 class TestPricing(unittest.TestCase):
@@ -61,7 +57,7 @@ class TestPricing(unittest.TestCase):
 
     def setUp(self):
         xmlconfig.xmlconfig(StringIO(configuration))
-        provideAdapter(TestingAssignable)
+        cpt.provideAdapter(TestingAssignable)
 
     def testAdaptation(self):
         context = StubContext()
@@ -93,7 +89,7 @@ class TestPricing(unittest.TestCase):
         context = StubContext()
         priced = behaviors.IPriced(context)
         priced.enabled = True
-        self.assertRaises(Invalid, validation, priced)
+        self.assertRaises(zif.Invalid, validation, priced)
         # set a price and we're OK
         priced.price = 2.99
         self.assertEqual(None, validation(priced))

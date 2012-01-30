@@ -1,13 +1,11 @@
-from zope.interface import alsoProvides
-from zope.interface import Interface
-from zope.interface import invariant, Invalid
+from zope import interface as zif
 from zope import schema
 from plone.directives import form
 
 from experimental.shoppingbehavior import _
 
 
-class IPotentiallyPriced(Interface):
+class IPotentiallyPriced(zif.Interface):
     """ Marker interface for content types that can have pricing enabled. This
         interface on type for which the IPriced behavior is enabled.
     """
@@ -34,10 +32,10 @@ class IPriced(form.Schema):
         required=False,
     )
 
-    @invariant
+    @zif.invariant
     def priceMustBeSetIfEnabled(data):
         if data.enabled and data.price is None:
-            raise Invalid(
+            raise zif.Invalid(
                 _(u"A price must be set in order for pricing to be enabled."))
 
-alsoProvides(IPriced, form.IFormFieldProvider)
+zif.alsoProvides(IPriced, form.IFormFieldProvider)
