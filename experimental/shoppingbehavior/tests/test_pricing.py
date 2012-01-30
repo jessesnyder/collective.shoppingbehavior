@@ -39,6 +39,7 @@ configuration = """\
       title="Pricing"
       description="Store a price for the adapted item and boolean 'active setting'"
       provides=".behaviors.IPriced"
+      marker=".behaviors.IPotentiallyPriced"
       factory="plone.behavior.AnnotationStorage" />
 
 </configure>
@@ -69,10 +70,25 @@ class TestPricing(unittest.TestCase):
         xmlconfig.xmlconfig(StringIO(configuration))
         provideAdapter(TestingAssignable)
 
-    def testAdaptedContentHasPriceAndActive(self):
+    def testAdaptation(self):
         context = SomeContext()
         priced = behaviors.IPriced(context)
         self.assertTrue(priced is not None)
+
+    def testEnabled(self):
+        context = SomeContext()
+        priced = behaviors.IPriced(context)
+        self.assertTrue(hasattr(priced, 'enabled'))
+        # should be false by default
+        self.failIf(priced.enabled)
+        # should be settable
+        priced.enabled = True
+        self.assertEqual(True, behaviors.IPriced(context).enabled)
+
+    def testPrice(self):
+        context = SomeContext()
+        priced = behaviors.IPriced(context)
+        self.assertTrue(hasattr(priced, 'price'))
         # starts with null price by default
         self.assertEqual(None, priced.price)
         # but you can assign and re-obtain the attributes
