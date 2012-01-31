@@ -2,7 +2,7 @@ import unittest2 as unittest
 from StringIO import StringIO
 
 from zope.configuration import xmlconfig
-from zope import component as cpt
+from zope import component
 from zope import interface as zif
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.behavior.interfaces import IBehavior
@@ -37,7 +37,7 @@ configuration = """\
 
 class TestingAssignable(object):
     zif.implements(IBehaviorAssignable)
-    cpt.adapts(zif.Interface)
+    component.adapts(zif.Interface)
     enabled = [behaviors.IPriced]
 
     def __init__(self, context):
@@ -48,7 +48,7 @@ class TestingAssignable(object):
 
     def enumerateBehaviors(self):
         for e in self.enabled:
-            yield cpt.queryUtility(IBehavior, name=e.__identifier__)
+            yield component.queryUtility(IBehavior, name=e.__identifier__)
 
 
 class TestPricing(unittest.TestCase):
@@ -57,7 +57,7 @@ class TestPricing(unittest.TestCase):
 
     def setUp(self):
         xmlconfig.xmlconfig(StringIO(configuration))
-        cpt.provideAdapter(TestingAssignable)
+        component.provideAdapter(TestingAssignable)
 
     def testAdaptation(self):
         context = StubContext()
