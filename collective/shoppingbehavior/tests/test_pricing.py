@@ -7,18 +7,18 @@ from zope import interface as zif
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.behavior.interfaces import IBehavior
 
-from experimental.shoppingbehavior import behaviors
-from experimental.shoppingbehavior.testing import StubContext
+from collective.shoppingbehavior import behaviors
+from collective.shoppingbehavior.testing import StubContext
 
 from plone.testing.zca import UNIT_TESTING
 
 
 configuration = """\
 <configure
-    package="experimental.shoppingbehavior"
+    package="collective.shoppingbehavior"
     xmlns="http://namespaces.zope.org/zope"
     xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="experimental.shoppingbehavior">
+    i18n_domain="collective.shoppingbehavior">
 
   <include package="zope.component" file="meta.zcml" />
   <include package="plone.behavior" file="meta.zcml" />

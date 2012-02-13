@@ -5,8 +5,8 @@ from zope.cachedescriptors.property import Lazy as lazy_property
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from plone.app.portlets.portlets import base
 
-from experimental.shoppingbehavior import _
-from experimental.shoppingbehavior import behaviors
+from collective.shoppingbehavior import _
+from collective.shoppingbehavior import behaviors
 
 
 class IShoppingPortlet(IPortletDataProvider):

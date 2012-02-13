@@ -18,12 +18,12 @@ class ExpShopping(PloneSandboxLayer):
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
-        import experimental.shoppingbehavior
-        xmlconfig.file('configure.zcml', experimental.shoppingbehavior,
+        import collective.shoppingbehavior
+        xmlconfig.file('configure.zcml', collective.shoppingbehavior,
                             context=configurationContext)
 
     def setUpPloneSite(self, portal):
-        applyProfile(portal, 'experimental.shoppingbehavior:default')
+        applyProfile(portal, 'collective.shoppingbehavior:default')
 
 EXP_SHOPPING_FIXTURE = ExpShopping()
 EXP_SHOPPING_INTEGRATION_TESTING = IntegrationTesting(

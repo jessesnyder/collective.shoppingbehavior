@@ -2,7 +2,7 @@ from zope import interface as zif
 from zope import schema
 from plone.directives import form
 
-from experimental.shoppingbehavior import _
+from collective.shoppingbehavior import _
 
 
 class IPotentiallyPriced(zif.Interface):

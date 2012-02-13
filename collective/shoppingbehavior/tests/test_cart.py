@@ -1,13 +1,13 @@
 import unittest2 as unittest
 import fudge
 from zope.publisher.browser import TestRequest
-from experimental.shoppingbehavior import cart
+from collective.shoppingbehavior import cart
 
 
 class TestCart(unittest.TestCase):
 
-    @fudge.patch('experimental.shoppingbehavior.cart.get_cart')
-    @fudge.patch('experimental.shoppingbehavior.cart.queryMultiAdapter')
+    @fudge.patch('collective.shoppingbehavior.cart.get_cart')
+    @fudge.patch('collective.shoppingbehavior.cart.queryMultiAdapter')
     def testAdd(self, fake_get_cart, queryMultiAdapter):
         # set up a fake cart
         (fake_get_cart.expects_call()
@@ -35,7 +35,7 @@ class TestCartView(unittest.TestCase):
         isolation.
     """
 
-    @fudge.patch('experimental.shoppingbehavior.cart.Cart')
+    @fudge.patch('collective.shoppingbehavior.cart.Cart')
     def testCartViewCallsWithZeroQtyByDefault(self, Cart):
         context = object()
         fakeCartInstance = (fudge.Fake()
@@ -47,7 +47,7 @@ class TestCartView(unittest.TestCase):
         view = cart.CartView(context, TestRequest())
         view.update()
 
-    @fudge.patch('experimental.shoppingbehavior.cart.Cart')
+    @fudge.patch('collective.shoppingbehavior.cart.Cart')
     def testCartViewCallsWithQtyFromRequest(self, Cart):
         context = object()
         testQty = '3'
@@ -61,7 +61,7 @@ class TestCartView(unittest.TestCase):
         view = cart.CartView(context, request)
         view.update()
 
-    @fudge.patch('experimental.shoppingbehavior.cart.Cart')
+    @fudge.patch('collective.shoppingbehavior.cart.Cart')
     def testOnlyCallsCheckoutIfAddSucceeds(self, Cart):
         context = object()
         testQty = '3'

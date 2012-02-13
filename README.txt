@@ -1,7 +1,7 @@
-experimental.shoppingbehavior
+collective.shoppingbehavior
 =============================
 
-This document contains design notes for the ``experimental.shoppingbehavior``
+This document contains design notes for the ``collective.shoppingbehavior``
 package.
 
 Introduction

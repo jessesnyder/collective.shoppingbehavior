@@ -10,7 +10,7 @@ from getpaid.core.item import PayableLineItem
 from groundwire.checkout.utils import get_cart
 from groundwire.checkout.utils import redirect_to_checkout
 
-from experimental.shoppingbehavior import behaviors
+from collective.shoppingbehavior import behaviors
 
 
 class ICallbackLineItem(IPayableLineItem):

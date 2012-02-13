@@ -4,7 +4,7 @@ from zope.component import queryUtility
 from plone.behavior.interfaces import IBehavior
 from zope.annotation.interfaces import IAttributeAnnotatable
 
-from experimental.shoppingbehavior.testing import EXP_SHOPPING_INTEGRATION_TESTING
+from collective.shoppingbehavior.testing import EXP_SHOPPING_INTEGRATION_TESTING
 
 
 class SomeContext(object):
@@ -17,11 +17,11 @@ class TestConfiguration(unittest.TestCase):
 
     def testBehaviorInRegistry(self):
         priced = queryUtility(IBehavior,
-                name='experimental.shoppingbehavior.behaviors.IPriced')
+                name='collective.shoppingbehavior.behaviors.IPriced')
         self.failUnless(priced is not None)
 
     def testBehaviorProvidesFields(self):
         from plone.directives.form import IFormFieldProvider
         priced = queryUtility(IBehavior,
-                name='experimental.shoppingbehavior.behaviors.IPriced')
+                name='collective.shoppingbehavior.behaviors.IPriced')
         self.assertTrue(IFormFieldProvider.providedBy(priced.interface))

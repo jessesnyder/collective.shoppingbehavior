@@ -1,6 +1,6 @@
 <portlets>
   <portlet
-    addview="experimental.shoppingbehavior"
+    addview="collective.shoppingbehavior"
     title="Shopping Cart"
     description="A portlet for adding things to the shopping cart." />
 </portlets>

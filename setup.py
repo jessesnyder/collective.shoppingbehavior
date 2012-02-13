@@ -3,7 +3,7 @@ import os
 
 version = '1.0'
 
-setup(name='experimental.shoppingbehavior',
+setup(name='collective.shoppingbehavior',
     version=version,
     description="Plone behavior to support price assignment on dexterity content",
     long_description=open("README.txt").read() + "\n" +
@@ -17,10 +17,10 @@ setup(name='experimental.shoppingbehavior',
     keywords='',
     author='Jesse Snyder',
     author_email='jsnyder@wesleyan.edu',
-    url='https://github.com/jessesnyder/experimental.shoppingbehavior',
+    url='https://github.com/jessesnyder/collective.shoppingbehavior',
     license='GPL',
     packages=find_packages(exclude=['ez_setup']),
-    namespace_packages=['experimental'],
+    namespace_packages=['collective'],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
