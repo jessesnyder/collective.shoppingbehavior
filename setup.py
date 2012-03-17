@@ -26,6 +26,7 @@ setup(name='collective.shoppingbehavior',
     install_requires=[
       'setuptools',
       'Products.CMFPlone',
+      'groundwire.checkout',
     ],
     extras_require={
       'test': [
