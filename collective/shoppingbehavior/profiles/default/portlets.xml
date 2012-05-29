@@ -1,6 +1,11 @@
 <portlets>
   <portlet
-    addview="collective.shoppingbehavior"
-    title="Shopping Cart"
+    addview="collective.shoppingbehavior.cartadd"
+    title="Add to Shopping Cart"
     description="A portlet for adding things to the shopping cart." />
+
+  <portlet
+    addview="collective.shoppingbehavior.cartlisting"
+    title="Shopping Cart"
+    description="A portlet for showing the contents of the shopping cart." />
 </portlets>

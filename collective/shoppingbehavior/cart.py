@@ -2,6 +2,8 @@ from five import grok
 from Acquisition import aq_inner
 from zope.component import queryMultiAdapter
 from plone.uuid.interfaces import IUUID
+from plone.app.layout.navigation.interfaces import INavigationRoot
+from Products.statusmessages.interfaces import IStatusMessage
 from Products.CMFPlone.utils import safe_unicode
 from getpaid.core.interfaces import IPayableLineItem
 from getpaid.core.interfaces import ILineItemFactory
@@ -83,6 +85,19 @@ class Cart(object):
     def checkout(self):
         redirect_to_checkout()
 
+    def contains(self, item_id):
+        return item_id in self.cart
+
+    def size(self):
+        return self.cart.size()
+
+    def items(self):
+        return self.cart.items()
+
+    def remove(self, item_id):
+        if item_id in self.cart:
+            del self.cart[item_id]
+
 
 class CartView(grok.View):
     """ Adds the context object to the shopping cart if possible.
@@ -101,3 +116,43 @@ class CartView(grok.View):
 
     def render(self):
         return u''
+
+
+class CartUpdate(grok.View):
+    """ Update quantities or remove items from the shopping cart """
+    grok.name("csb-cart-update")
+    grok.context(INavigationRoot)
+    grok.require('zope2.View')
+
+    def update(self):
+        self.cart = Cart()
+        self.has_items = self.cart.size() > 0
+        self.contents = self.items()
+        if "update_cart" in self.request.form:
+            self.update_cart(self.request.form)
+            IStatusMessage(self.request).addStatusMessage(
+                u"Shopping cart updated.", type='info')
+            self.request.response.redirect(
+                self.context.absolute_url() + '/' + self.__name__)
+
+            return ''
+
+    def update_cart(self, form):
+        deletable = form.get('delete', [])
+        for item_id in deletable:
+            self.cart.remove(item_id)
+
+    def items(self):
+        contents = []
+        cart_contents = self.cart.items()
+        if not cart_contents:
+            return contents
+        for item in cart_contents:
+            data = {}
+            data['item_id'] = item[0]
+            data['title'] = item[1].name
+            data['price'] = item[1].cost
+            data['quantity'] = item[1].quantity
+            data['description'] = item[1].description
+            contents.append(data)
+        return contents

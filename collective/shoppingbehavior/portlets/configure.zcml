@@ -5,10 +5,18 @@
     <include package="plone.app.portlets" />
 
     <plone:portlet
-        name="collective.shoppingbehavior"
-        interface=".shopping.IShoppingPortlet"
-        assignment=".shopping.Assignment"
-        renderer=".shopping.Renderer"
-        addview=".shopping.AddForm"
+        name="collective.shoppingbehavior.cartadd"
+        interface=".shopping.IAddToCartPortlet"
+        assignment=".shopping.AddToCartPortletAssignment"
+        renderer=".shopping.AddToCartPortletRenderer"
+        addview=".shopping.AddToCartPortletAddForm"
     />
+    <plone:portlet
+        name="collective.shoppingbehavior.cartlisting"
+        interface=".shopping.ICartListingPortlet"
+        assignment=".shopping.CartListingPortletAssignment"
+        renderer=".shopping.CartListingPortletRenderer"
+        addview=".shopping.CartListingPortletAddForm"
+    />
+
 </configure>
