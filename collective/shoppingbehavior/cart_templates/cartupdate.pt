@@ -1,0 +1,80 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      i18n:domain="plone"
+      metal:use-macro="context/main_template/macros/master">
+
+  <metal:block fill-slot="main">
+
+    <style type="text/css">
+    .listing {
+        width: 100%;
+    }
+    tr.cart-row-discount {
+      border-top: none;
+    }
+    tr.cart-row-discount td {
+      text-align: right;
+    }
+    </style>
+
+    <h1 class="documentFirstHeading">Shopping Cart</h1>
+
+    <div id="content-core"
+         tal:define="has_items view/has_items;
+                     contents view/contents">
+
+        <tal:noitems tal:condition="not: has_items">
+          You don't have any items in your cart.
+        </tal:noitems>
+
+        <tal:hasitems tal:condition="has_items">
+          Your shopping cart currently contains the following items:
+          <form tal:attributes="action request/URL" method="post">
+            <input type="hidden" name="update_cart" value="True" />
+            <table class="listing cart-table">
+              <tr>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Remove?</th>
+              </tr>
+              <tal:items tal:repeat="item contents">
+              <tr>
+                <td>
+                  <strong tal:content="item/title" />
+                </td>
+                <td>
+                    <span tal:content="item/price" />
+                </td>
+                <td>
+                    <span tal:content="item/quantity" />
+                </td>
+                <td>
+                    <span tal:content="python:'%.2f' % (item['price'] * item['quantity'])" />
+                </td>
+                <td><input type="checkbox"
+                              name="delete:list"
+                              tal:attributes="value item/item_id"></td>
+              </tr>
+
+              </tal:items>
+  <!--             <tr>
+                <th colspan="3">TOTAL</th>
+                <th tal:content="python:'%.2f' % (sum([(item.cost * item.quantity) for item in context.values()]))" />
+              </tr> -->
+            </table>
+            <input type="submit"
+                 i18n:attributes="value label_update_cart"
+                 value="Update Cart" />
+          </form>
+          <!-- <tal:cart replace="structure cart/@@cart_update_view" /> -->
+
+        </tal:hasitems>
+    </div>
+
+  </metal:block>
+
+</html>
