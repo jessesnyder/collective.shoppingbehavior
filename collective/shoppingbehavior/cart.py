@@ -98,6 +98,30 @@ class Cart(object):
         if item_id in self.cart:
             del self.cart[item_id]
 
+    def update_quantity(self, item_id, qty):
+        if not self.contains(item_id):
+            return
+        if qty < 1:
+            self.remove(item_id)
+        else:
+            lineitem = self.cart[item_id]
+            lineitem.quantity = qty
+
+
+class CheckoutView(grok.View):
+    """ Redirects the user to the checkout page.
+    """
+    grok.name('csb-checkout')
+    grok.context(INavigationRoot)
+    grok.require('zope2.View')
+
+    def update(self):
+        cart = Cart()
+        cart.checkout()
+
+    def render(self):
+        return u''
+
 
 class CartView(grok.View):
     """ Adds the context object to the shopping cart if possible.
@@ -112,7 +136,9 @@ class CartView(grok.View):
         qty = int(self.request.form.get('quantity', 0))
         added = cart.add(context, qty)
         if added:
-            cart.checkout()
+            IStatusMessage(self.request).addStatusMessage(
+                            u"Shopping cart updated.", type='info')
+            self.request.response.redirect(self.context.absolute_url())
 
     def render(self):
         return u''
@@ -135,12 +161,14 @@ class CartUpdate(grok.View):
             self.request.response.redirect(
                 self.context.absolute_url() + '/' + self.__name__)
 
-            return ''
+        return ''
 
     def update_cart(self, form):
-        deletable = form.get('delete', [])
-        for item_id in deletable:
-            self.cart.remove(item_id)
+        new_qtys = form.get('quantities', [])
+        for qty_info in new_qtys:
+            item_id = qty_info['id']
+            qty = int(qty_info['quantity'])
+            self.cart.update_quantity(item_id, qty)
 
     def items(self):
         contents = []

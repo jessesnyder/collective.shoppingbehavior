@@ -39,7 +39,6 @@
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Total</th>
-                <th>Remove?</th>
               </tr>
               <tal:items tal:repeat="item contents">
               <tr>
@@ -50,14 +49,13 @@
                     <span tal:content="item/price" />
                 </td>
                 <td>
-                    <span tal:content="item/quantity" />
+                    <!-- <span tal:content="item/quantity" /> -->
+                    <input type="hidden" name="quantities.id:records" tal:attributes="value item/item_id" />
+                    <input type="text" size="4" tal:attributes="value item/quantity" name="quantities.quantity:records" />
                 </td>
                 <td>
                     <span tal:content="python:'%.2f' % (item['price'] * item['quantity'])" />
                 </td>
-                <td><input type="checkbox"
-                              name="delete:list"
-                              tal:attributes="value item/item_id"></td>
               </tr>
 
               </tal:items>

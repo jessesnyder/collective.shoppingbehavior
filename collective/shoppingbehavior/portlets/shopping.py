@@ -93,6 +93,9 @@ class CartListingPortletRenderer(base.Renderer):
     def cart(self):
         return Cart()
 
+    def checkout(self):
+        self.cart.checkout()
+
     @property
     def items(self):
         contents = []

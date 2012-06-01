@@ -39,7 +39,13 @@
               method="post">
           <input type="submit"
                  i18n:attributes="value label_update_cart"
-                 value="Update Cart" />
+                 value="Edit your cart" />
+        </form>
+        <form tal:attributes= "action string:${view/portal_url}/@@csb-checkout"
+              method="post">
+          <input type="submit"
+                 i18n:attributes="value label_check_out"
+                 value="Check out now" />
         </form>
         <span class="portletBottomLeft"></span>
         <span class="portletBottomRight"></span>
