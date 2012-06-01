@@ -184,3 +184,7 @@ class CartUpdate(grok.View):
             data['description'] = item[1].description
             contents.append(data)
         return contents
+
+    @property
+    def currency(self):
+        return u"$"

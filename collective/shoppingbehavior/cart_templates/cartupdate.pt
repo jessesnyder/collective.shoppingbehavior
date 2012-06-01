@@ -46,6 +46,7 @@
                   <strong tal:content="item/title" />
                 </td>
                 <td>
+                    <span tal:content="view/currency" />
                     <span tal:content="item/price" />
                 </td>
                 <td>
@@ -54,15 +55,18 @@
                     <input type="text" size="4" tal:attributes="value item/quantity" name="quantities.quantity:records" />
                 </td>
                 <td>
+                    <span tal:content="view/currency" />
                     <span tal:content="python:'%.2f' % (item['price'] * item['quantity'])" />
                 </td>
               </tr>
 
               </tal:items>
-  <!--             <tr>
+              <tr>
                 <th colspan="3">TOTAL</th>
-                <th tal:content="python:'%.2f' % (sum([(item.cost * item.quantity) for item in context.values()]))" />
-              </tr> -->
+                <th> <span tal:content="view/currency" />
+                     <span tal:content="python:'%.2f' % (sum([(item['price'] * item['quantity']) for item in contents]))" />
+                </th>
+              </tr>
             </table>
             <input type="submit"
                  i18n:attributes="value label_update_cart"
