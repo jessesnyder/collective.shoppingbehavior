@@ -32,7 +32,9 @@ class NamedPrice(object):
 
 
 class PriceList(list):
-    pass
+
+    def __repr__(self):
+        return "PriceList%s" % list.__repr__(self)
 
 
 class PriceListField(schema.List):
