@@ -59,12 +59,12 @@ class IPriced(form.Schema):
     pricelist = PriceListField(
         title=u"Price list",
         value_type=schema.Object(title=u"Price", schema=INamedPriceSchema),
-        missing_value=PriceList(),
+        missing_value=None,
     )
 
     @zif.invariant
     def priceMustBeSetIfEnabled(data):
-        if data.enabled and data.pricelist == PriceList():
+        if data.enabled and data.pricelist == None:
             raise zif.Invalid(
                 _(u"At least one price must be set in order for pricing to be enabled."))
 

@@ -59,35 +59,39 @@ class TestPricing(unittest.TestCase):
     def setUp(self):
         xmlconfig.xmlconfig(StringIO(configuration))
         component.provideAdapter(TestingAssignable)
-        self.context = StubContext()
 
     def testAdaptation(self):
-        priced = behaviors.IPriced(self.context)
+        context = StubContext()
+        priced = behaviors.IPriced(context)
         self.assertTrue(priced is not None)
 
     def testEnabled(self):
-        priced = behaviors.IPriced(self.context)
+        context = StubContext()
+        priced = behaviors.IPriced(context)
         self.assertTrue(hasattr(priced, 'enabled'))
         # should be false by default
         self.failIf(priced.enabled)
         # should be settable
         priced.enabled = True
-        self.assertEqual(True, behaviors.IPriced(self.context).enabled)
+        self.assertEqual(True, behaviors.IPriced(context).enabled)
 
     def testPricelist(self):
-        priced = behaviors.IPriced(self.context)
+        context = StubContext()
+        priced = behaviors.IPriced(context)
         self.assertTrue(hasattr(priced, 'pricelist'))
         self.assertEqual("PriceList", priced.pricelist.__class__.__name__)
 
     def testPriceListEmtpyByDefault(self):
-        priced = behaviors.IPriced(self.context)
-        import pdb; pdb.set_trace()
+        context = StubContext()
+        import pdb; pdb.set_trace( )
+        priced = behaviors.IPriced(context)
         self.assertEqual(behaviors.PriceList(), priced.pricelist)
 
     def testPriceListAcceptsNewNamedPriceObjects(self):
-        priced = behaviors.IPriced(self.context)
+        context = StubContext()
+        priced = behaviors.IPriced(context)
         priced.pricelist.append(behaviors.NamedPrice(2.99))
-        self.assertEqual(2.99, behaviors.IPriced(self.context).pricelist[0].price)
+        self.assertEqual(2.99, behaviors.IPriced(context).pricelist[0].price)
 
     # def testInvariants(self):
     #     validation = behaviors.IPriced.validateInvariants
