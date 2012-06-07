@@ -34,6 +34,7 @@ setup(name='collective.shoppingbehavior',
         'mock',
         'plone.mocktestcase',
         'fudge',
+        'collective.z3cform.datagridfield',
         ]
     },
     entry_points="""

@@ -51,6 +51,8 @@ class TestingAssignable(object):
         for e in self.enabled:
             yield component.queryUtility(IBehavior, name=e.__identifier__)
 
+EMPTY_PRICELIST = None
+
 
 class TestPricing(unittest.TestCase):
 
@@ -75,30 +77,25 @@ class TestPricing(unittest.TestCase):
         priced.enabled = True
         self.assertEqual(True, behaviors.IPriced(context).enabled)
 
-    def testPricelist(self):
+    def testPriceListDefaultsToOurMissingValue(self):
         context = StubContext()
         priced = behaviors.IPriced(context)
-        self.assertTrue(hasattr(priced, 'pricelist'))
-        self.assertEqual("PriceList", priced.pricelist.__class__.__name__)
-
-    def testPriceListEmtpyByDefault(self):
-        context = StubContext()
-        import pdb; pdb.set_trace( )
-        priced = behaviors.IPriced(context)
-        self.assertEqual(behaviors.PriceList(), priced.pricelist)
+        self.assertEqual(EMPTY_PRICELIST, priced.pricelist)
 
     def testPriceListAcceptsNewNamedPriceObjects(self):
         context = StubContext()
         priced = behaviors.IPriced(context)
+        priced.pricelist = behaviors.PriceList()
         priced.pricelist.append(behaviors.NamedPrice(2.99))
         self.assertEqual(2.99, behaviors.IPriced(context).pricelist[0].price)
 
-    # def testInvariants(self):
-    #     validation = behaviors.IPriced.validateInvariants
-    #     context = StubContext()
-    #     priced = behaviors.IPriced(context)
-    #     priced.enabled = True
-    #     self.assertRaises(zif.Invalid, validation, priced)
-    #     # set a price and we're OK
-    #     priced.price = 2.99
-    #     self.assertEqual(None, validation(priced))
+    def testInvariants(self):
+        validation = behaviors.IPriced.validateInvariants
+        context = StubContext()
+        priced = behaviors.IPriced(context)
+        priced.enabled = True
+        self.assertRaises(zif.Invalid, validation, priced)
+        # set a price and we're OK
+        priced.pricelist = behaviors.PriceList()
+        priced.pricelist.append(behaviors.NamedPrice(2.99))
+        self.assertEqual(None, validation(priced))

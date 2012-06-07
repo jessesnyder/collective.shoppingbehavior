@@ -9,6 +9,8 @@ from z3c.form.converter import BaseDataConverter
 
 from collective.shoppingbehavior import _
 
+EMPTY_PRICELIST = None
+
 
 class IPotentiallyPriced(zif.Interface):
     """ Marker interface for content types that can have pricing enabled. This
@@ -59,12 +61,12 @@ class IPriced(form.Schema):
     pricelist = PriceListField(
         title=u"Price list",
         value_type=schema.Object(title=u"Price", schema=INamedPriceSchema),
-        missing_value=None,
+        missing_value=EMPTY_PRICELIST,
     )
 
     @zif.invariant
     def priceMustBeSetIfEnabled(data):
-        if data.enabled and data.pricelist == None:
+        if data.enabled and data.pricelist == EMPTY_PRICELIST:
             raise zif.Invalid(
                 _(u"At least one price must be set in order for pricing to be enabled."))
 
