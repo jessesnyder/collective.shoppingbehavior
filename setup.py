@@ -27,6 +27,7 @@ setup(name='collective.shoppingbehavior',
       'setuptools',
       'Products.CMFPlone',
       'groundwire.checkout',
+      'collective.z3cform.datagridfield',
     ],
     extras_require={
       'test': [
@@ -34,7 +35,6 @@ setup(name='collective.shoppingbehavior',
         'mock',
         'plone.mocktestcase',
         'fudge',
-        'collective.z3cform.datagridfield',
         ]
     },
     entry_points="""
