@@ -86,8 +86,9 @@ class TestPricing(unittest.TestCase):
         context = StubContext()
         priced = behaviors.IPriced(context)
         priced.pricelist = behaviors.PriceList()
-        priced.pricelist.append(behaviors.NamedPrice(2.99))
-        self.assertEqual(2.99, behaviors.IPriced(context).pricelist[0].price)
+        a_price = Decimal('2.99')
+        priced.pricelist.append(behaviors.NamedPrice(a_price))
+        self.assertEqual(a_price, behaviors.IPriced(context).pricelist[0].price)
 
     def testInvariants(self):
         validation = behaviors.IPriced.validateInvariants
@@ -96,6 +97,7 @@ class TestPricing(unittest.TestCase):
         priced.enabled = True
         self.assertRaises(zif.Invalid, validation, priced)
         # set a price and we're OK
+        a_price = Decimal('2.99')
         priced.pricelist = behaviors.PriceList()
-        priced.pricelist.append(behaviors.NamedPrice(2.99))
+        priced.pricelist.append(behaviors.NamedPrice(a_price))
         self.assertEqual(None, validation(priced))

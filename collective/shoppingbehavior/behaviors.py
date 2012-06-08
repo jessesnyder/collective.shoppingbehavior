@@ -2,8 +2,8 @@ from zope import interface as zif
 from five import grok
 from zope import schema
 from plone.directives import form
-from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow, IDataGridField
-from z3c.form.interfaces import DISPLAY_MODE, HIDDEN_MODE, IDataConverter, NO_VALUE
+from collective.z3cform.datagridfield import DataGridFieldFactory, IDataGridField
+from z3c.form.interfaces import IDataConverter, NO_VALUE
 from zope.schema import getFieldsInOrder
 from z3c.form.converter import BaseDataConverter
 
@@ -24,6 +24,10 @@ class INamedPriceSchema(zif.Interface):
 
 
 class NamedPrice(object):
+    """ A price may have a name associated with it which distinguishes it
+        amoung the other prices in the pricelist. For example "members" vs.
+        "non-members".
+    """
     zif.implements(INamedPriceSchema)
 
     def __init__(self, price, name=u''):
@@ -32,20 +36,20 @@ class NamedPrice(object):
 
 
 class PriceList(list):
-
+    """ A list of available prices """
     def __repr__(self):
         return "PriceList%s" % list.__repr__(self)
 
 
 class PriceListField(schema.List):
-    """We need to have a unique class for the field list so that we
-       can apply a custom adapter.
+    """ We need to have a unique class for the field list so that we
+        can apply a custom adapter.
     """
     pass
 
 
 class IPriced(form.Schema):
-    """ Add a price to a content object
+    """ Add a price list to a content object
     """
 
     form.fieldset(
@@ -76,13 +80,14 @@ zif.alsoProvides(IPriced, form.IFormFieldProvider)
 
 
 class GridDataConverter(grok.MultiAdapter, BaseDataConverter):
-    """ Convert between the PriceList object and the widget. """
+    """ Convert between the PriceList object and a data structure expected by
+        the widget.
+    """
 
     grok.adapts(PriceListField, IDataGridField)
     grok.implements(IDataConverter)
 
     def toWidgetValue(self, value):
-        """Simply pass the data through with no change"""
         rv = list()
         for row in value:
             d = dict()
