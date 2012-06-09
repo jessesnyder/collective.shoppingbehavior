@@ -5,11 +5,11 @@ from decimal import Decimal
 from zope.configuration import xmlconfig
 from zope import component
 from zope import interface as zif
+from zope.annotation.interfaces import IAttributeAnnotatable
 from plone.behavior.interfaces import IBehaviorAssignable
 from plone.behavior.interfaces import IBehavior
 
 from collective.shoppingbehavior import behaviors
-from collective.shoppingbehavior.testing import StubContext
 
 from plone.testing.zca import UNIT_TESTING
 
@@ -52,6 +52,13 @@ class TestingAssignable(object):
             yield component.queryUtility(IBehavior, name=e.__identifier__)
 
 EMPTY_PRICELIST = None
+
+
+class StubContext(object):
+    zif.implements(IAttributeAnnotatable)
+
+    def __init__(self, id="stubcontext"):
+        self.id = id
 
 
 class TestPricing(unittest.TestCase):

@@ -2,17 +2,11 @@ from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import applyProfile
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import IntegrationTesting
-from zope.interface import implements
-from zope.annotation.interfaces import IAttributeAnnotatable
 
 from zope.configuration import xmlconfig
 
 
-class StubContext(object):
-    implements(IAttributeAnnotatable)
-
-
-class ExpShopping(PloneSandboxLayer):
+class CollectiveShopping(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE,)
 
@@ -25,6 +19,7 @@ class ExpShopping(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.shoppingbehavior:default')
 
-EXP_SHOPPING_FIXTURE = ExpShopping()
-EXP_SHOPPING_INTEGRATION_TESTING = IntegrationTesting(
-        bases=(EXP_SHOPPING_FIXTURE,), name="ExpShopping:Integration")
+COLLECTIVE_SHOPPING_FIXTURE = CollectiveShopping()
+COLLECTIVE_SHOPPING_INTEGRATION_TESTING = IntegrationTesting(
+        bases=(COLLECTIVE_SHOPPING_FIXTURE,),
+        name="CollectiveShopping:Integration")

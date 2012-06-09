@@ -4,7 +4,7 @@ from zope.component import queryUtility
 from plone.behavior.interfaces import IBehavior
 from zope.annotation.interfaces import IAttributeAnnotatable
 
-from collective.shoppingbehavior.testing import EXP_SHOPPING_INTEGRATION_TESTING
+from collective.shoppingbehavior.testing import COLLECTIVE_SHOPPING_INTEGRATION_TESTING
 
 
 class SomeContext(object):
@@ -13,7 +13,7 @@ class SomeContext(object):
 
 class TestConfiguration(unittest.TestCase):
 
-    layer = EXP_SHOPPING_INTEGRATION_TESTING
+    layer = COLLECTIVE_SHOPPING_INTEGRATION_TESTING
 
     def testBehaviorInRegistry(self):
         priced = queryUtility(IBehavior,
