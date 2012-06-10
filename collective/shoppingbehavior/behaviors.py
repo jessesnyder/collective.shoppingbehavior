@@ -2,6 +2,7 @@ from zope import interface as zif
 from five import grok
 from zope import schema
 from plone.directives import form
+from Products.CMFPlone.utils import safe_unicode
 from collective.z3cform.datagridfield import DataGridFieldFactory, IDataGridField
 from z3c.form.interfaces import IDataConverter, NO_VALUE
 from zope.schema import getFieldsInOrder
@@ -34,11 +35,25 @@ class NamedPrice(object):
         self.price = price
         self.name = name
 
+    def id_in_context(self, context):
+        return safe_unicode(context.id) + u"-" + safe_unicode(self.name)
+
+    def title_in_context(self, context):
+        return safe_unicode(context.title) + u" (" + safe_unicode(self.name) + u")"
+
 
 class PriceList(list):
     """ A list of available prices """
     def __repr__(self):
         return "PriceList%s" % list.__repr__(self)
+
+    def by_name(self, name):
+        """ Return a NamedPrice by name from this PriceList
+        """
+        matches = [np for np in self if np.name == name]
+        if matches:
+            return matches[0]
+        return None
 
 
 class PriceListField(schema.List):

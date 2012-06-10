@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import unittest2 as unittest
 from StringIO import StringIO
 from decimal import Decimal
+import fudge
 
 from zope.configuration import xmlconfig
 from zope import component
@@ -12,6 +15,63 @@ from plone.behavior.interfaces import IBehavior
 from collective.shoppingbehavior import behaviors
 
 from plone.testing.zca import UNIT_TESTING
+
+
+class TestPriceList(unittest.TestCase):
+
+    NAMED_PRICE_NOT_FOUND = None
+
+    def testCanFindASinglePriceByName(self):
+        pricelist = behaviors.PriceList()
+        np = behaviors.NamedPrice(2.99, u"price one")
+        pricelist.append(np)
+        found = pricelist.by_name(u"price one")
+        self.assertEqual(np, found)
+
+    def testReturnsNotFoundValIfEmpty(self):
+        pricelist = behaviors.PriceList()
+        self.assertEqual(self.NAMED_PRICE_NOT_FOUND, pricelist.by_name(u"foo"))
+
+    def testReturnsNotFoundValWhenItMisses(self):
+        pricelist = behaviors.PriceList()
+        np = behaviors.NamedPrice(2.99, u"price one")
+        pricelist.append(np)
+        self.assertEqual(self.NAMED_PRICE_NOT_FOUND,
+                            pricelist.by_name(u"other one"))
+
+    def testReturnsFirstValueAddedIfThereAreMultipleMatches(self):
+        pricelist = behaviors.PriceList()
+        np1 = behaviors.NamedPrice(2.99, u"price one")
+        np2 = behaviors.NamedPrice(3.99, u"price one")
+        pricelist.append(np1)
+        pricelist.append(np2)
+        found = pricelist.by_name(u"price one")
+        self.assertEqual(np1, found)
+
+    def testWillFindANamelessPrice(self):
+        pricelist = behaviors.PriceList()
+        np = behaviors.NamedPrice(2.99)
+        pricelist.append(np)
+        found = pricelist.by_name(u"")
+        self.assertEqual(np, found)
+
+
+class TestNamedPrice(unittest.TestCase):
+
+    @fudge.test
+    def testConstructsLineFullIdForNamedPriceAndContext(self):
+        np = behaviors.NamedPrice(2.99, u"price one")
+        mock_context = (fudge.Fake('SomeContext')
+                             .has_attr(id=u"contéxt id"))
+        self.assertEqual(u"contéxt id-price one", np.id_in_context(mock_context))
+
+    @fudge.test
+    def testConstructsLineFullTitleForNamedPriceAndContext(self):
+        np = behaviors.NamedPrice(2.99, u"price one")
+        mock_context = (fudge.Fake('SomeContext')
+                             .has_attr(title=u"contéxt title"))
+        self.assertEqual(u"contéxt title (price one)",
+                        np.title_in_context(mock_context))
 
 
 configuration = """\

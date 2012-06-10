@@ -1,0 +1,55 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      tal:omit-tag="">
+    <dl class="portlet" id="portlet-cart-listing">
+
+    <dt class="portletHeader">
+        <span class="portletTopLeft"></span>
+        <span class="portletTopMiddle"
+          i18n:translate="text_product_details">Shopping Cart Contents</span>
+        <span class="portletTopRight"></span>
+    </dt>
+
+    <dd class="portletItem"
+        tal:repeat="item view/items">
+      <div>
+
+        <div class="productTitle"
+           tal:define="title item/title"
+           tal:condition="title"
+           tal:content="title">[Title]
+        </div>
+        Qty: <span class="productQuantity"
+              tal:content="item/quantity" />,
+        <span class="productPrice"
+           tal:define="price python: '%.2f' % item['price']"
+           tal:condition="price"
+       i18n:translate="text_price">
+             Price: <span i18n:name="value_currency"
+                          tal:content="view/currency" />
+             <span tal:content="price" i18n:name="value_price" />
+        </span>
+
+      </div>
+    </dd>
+
+    <dd class="portletFooter">
+        <form tal:attributes= "action string:${view/portal_url}/@@csb-cart-update"
+              method="post">
+          <input type="submit"
+                 i18n:attributes="value label_update_cart"
+                 value="Edit your cart" />
+        </form>
+        <form tal:attributes= "action string:${view/portal_url}/@@csb-checkout"
+              method="post">
+          <input type="submit"
+                 i18n:attributes="value label_check_out"
+                 value="Check out now" />
+        </form>
+        <span class="portletBottomLeft"></span>
+        <span class="portletBottomRight"></span>
+    </dd>
+
+</dl>
+</html>

@@ -2,7 +2,9 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       tal:omit-tag="">
-    <dl class="portlet" id="portlet-cart">
+<dl class="portlet" id="portlet-cart-add">
+  <form tal:attributes= "action string:${context/absolute_url}/@@csb-cart-add"
+              method="post">
 
     <dt class="portletHeader">
         <span class="portletTopLeft"></span>
@@ -25,31 +27,37 @@
            tal:condition="field"
            tal:content="field" >[Description]
         </p>
+        <tal:inputs tal:condition="not: view/context_is_in_cart">
+          <input type="hidden" name="add_item" value="True" />
+          <table class="price-choices">
+            <tr tal:repeat="price_option view/pricelist">
+              <td class="name" tal:content="price_option/name">[name]</td>
+              <td class="price">
+                <span tal:replace="view/currency" /><span tal:content="price_option/price">[$2.99]</span>
+              </td>
+              <td>
+                <input type="hidden" name="addables.id:records" tal:attributes="value price_option/name" />
+                <input type="text" size="4" name="addables.quantity:records" />
+            </tr>
 
-        <p class="productPrice"
-           tal:define="price python: '%.2f' % view.price"
-           tal:condition="price"
-       i18n:translate="text_price">
-             Price: <span i18n:name="value_currency"
-                          tal:content="view/currency" />
-             <span tal:content="price" i18n:name="value_price" />
-        </p>
+          </table>
+        </tal:inputs>
 
       </div>
     </dd>
 
     <dd class="portletFooter">
-        <form tal:attributes= "action string:${context/absolute_url}/@@xsb-cart-add"
-              method="post">
-          <input type="hidden" name="add_item" value="True" />
-          <input type="text" size="1" name="quantity" value="1" />
-          <input type="submit"
+      <tal:inputs tal:condition="not: view/context_is_in_cart">
+        <input type="submit"
                  i18n:attributes="value label_add_to_cart"
                  value="Add to Cart" />
-        </form>
-        <span class="portletBottomLeft"></span>
-        <span class="portletBottomRight"></span>
+      </tal:inputs>
+      <p tal:condition="view/context_is_in_cart">
+        This item is already in your shopping cart.
+      </p>
+      <span class="portletBottomLeft"></span>
+      <span class="portletBottomRight"></span>
     </dd>
-
+  </form>
 </dl>
 </html>
