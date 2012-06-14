@@ -90,9 +90,11 @@ class CartListingPortletAssignment(base.Assignment):
 
 class CartListingPortletRenderer(base.Renderer):
 
+    contextsWherePortletShouldNotShow = ('csb-cart-update', 'checkout')
+
     @property
     def available(self):
-        return self.cart.size() > 0
+        return self._isSensibleContext() and self.cart.size() > 0
 
     @lazy_property
     def cart(self):
@@ -125,6 +127,12 @@ class CartListingPortletRenderer(base.Renderer):
     def portal_url(self):
         url_tool = getToolByName(self.context, 'portal_url')
         return url_tool.getPortalObject().absolute_url()
+
+    def _isSensibleContext(self):
+        view = self.request.steps[-1].replace('@@', '')
+        if view in self.contextsWherePortletShouldNotShow:
+            return False
+        return True
 
     render = ViewPageTemplateFile('cartlisting.pt')
 
