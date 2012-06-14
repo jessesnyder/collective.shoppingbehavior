@@ -9,7 +9,7 @@ from groundwire.checkout.utils import get_cart
 
 from collective.shoppingbehavior import _
 from collective.shoppingbehavior import behaviors
-from collective.shoppingbehavior.cart import Shopper
+from collective.shoppingbehavior.cart import Shopper, StdNamingPolicy
 
 ### Adding items to the cart ###
 
@@ -60,7 +60,8 @@ class AddToCartPortletRenderer(base.Renderer):
     @property
     def context_is_in_cart(self):
         for namedprice in self.pricelist:
-            if self.cart.contains(namedprice.id_in_context(self.context)):
+            naming = StdNamingPolicy(namedprice, self.context)
+            if self.cart.contains(naming.id()):
                 return True
         return False
 

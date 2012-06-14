@@ -35,12 +35,6 @@ class NamedPrice(object):
         self.price = price
         self.name = name
 
-    def id_in_context(self, context):
-        return safe_unicode(context.id) + u"-" + safe_unicode(self.name)
-
-    def title_in_context(self, context):
-        return safe_unicode(context.title) + u" (" + safe_unicode(self.name) + u")"
-
 
 class PriceList(list):
     """ A list of available prices """

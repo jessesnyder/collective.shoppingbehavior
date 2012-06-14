@@ -56,24 +56,6 @@ class TestPriceList(unittest.TestCase):
         self.assertEqual(np, found)
 
 
-class TestNamedPrice(unittest.TestCase):
-
-    @fudge.test
-    def testConstructsLineFullIdForNamedPriceAndContext(self):
-        np = behaviors.NamedPrice(2.99, u"price one")
-        mock_context = (fudge.Fake('SomeContext')
-                             .has_attr(id=u"contéxt id"))
-        self.assertEqual(u"contéxt id-price one", np.id_in_context(mock_context))
-
-    @fudge.test
-    def testConstructsLineFullTitleForNamedPriceAndContext(self):
-        np = behaviors.NamedPrice(2.99, u"price one")
-        mock_context = (fudge.Fake('SomeContext')
-                             .has_attr(title=u"contéxt title"))
-        self.assertEqual(u"contéxt title (price one)",
-                        np.title_in_context(mock_context))
-
-
 configuration = """\
 <configure
     package="collective.shoppingbehavior"

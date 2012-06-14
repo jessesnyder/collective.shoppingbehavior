@@ -27,6 +27,55 @@ class CallbackLineItem(PayableLineItem):
         pass
 
 
+class StdNamingPolicy(object):
+
+    def __init__(self, namedprice, context):
+        self.namedprice = namedprice
+        self.context = context
+
+    def title(self):
+        return u"%s (%s)" % (safe_unicode(self.context.title),
+                             safe_unicode(self.namedprice.name))
+
+    def id(self):
+        return u"%s-%s" % (safe_unicode(self.context.id),
+                           safe_unicode(self.namedprice.name))
+
+
+class LineItemFactory(object):
+
+    def __init__(self, pricelist, context, addRequest, namingPolicy=StdNamingPolicy):
+        self.pricelist = pricelist
+        self.context = context
+        self.addRequest = addRequest
+        self.namingPolicy = namingPolicy
+
+    def create(self):
+        lineItems = []
+        for item in self.addRequest:
+            if not self._hasQuantity(item):
+                continue
+            namedprice = self.pricelist.by_name(item['id'])
+            if not namedprice:
+                continue
+            lineitem = CallbackLineItem()
+            naming = self.namingPolicy(namedprice, self.context)
+            lineitem.quantity = int(item['quantity'])
+            lineitem.cost = namedprice.price
+            lineitem.item_id = naming.id()
+            lineitem.name = naming.title()
+            lineitem.description = safe_unicode(self.context.description)
+            lineitem.uid = IUUID(self.context)
+            lineItems.append(lineitem)
+        return lineItems
+
+    def _hasQuantity(self, item):
+        qty = item['quantity'].strip()
+        if not qty:
+            return False
+        return bool(int(qty))
+
+
 class Shopper(object):
     """ Wrapper around a shopping cart, which should provide
         getpaid.core.interfaces.IShoppingCart.
@@ -105,27 +154,15 @@ class CartAddingView(grok.View):
         return u''
 
     def _lineitems(self, to_add):
-        """ [{'id': 'members', 'quantity': '1'},
+        """ to_add looks like this:
+
+            [{'id': 'members', 'quantity': '1'},
              {'id': 'non-members', 'quantity': ''}]
         """
         context = aq_inner(self.context)
-        lineitems = []
-        for item in to_add:
-            if not item['quantity']:
-                continue
-            priced = behaviors.IPriced(context)
-            lineitem = CallbackLineItem()
-            namedprice = priced.pricelist.by_name(item['id'])
-            if not namedprice:
-                continue
-            lineitem.cost = namedprice.price
-            lineitem.item_id = namedprice.id_in_context(context)
-            lineitem.name = namedprice.title_in_context(context)
-            lineitem.description = safe_unicode(context.description)
-            lineitem.quantity = int(item['quantity'])
-            lineitem.uid = IUUID(context)
-            lineitems.append(lineitem)
-        return lineitems
+        priced = behaviors.IPriced(context)
+        lineItemBuilder = LineItemFactory(priced.pricelist, context, to_add)
+        return lineItemBuilder.create()
 
 
 class CartUpdate(grok.View):
