@@ -2,8 +2,7 @@
 
 import unittest2 as unittest
 import fudge
-from zope.publisher.browser import TestRequest
-from collective.shoppingbehavior import cart
+from collective.shoppingbehavior import shop
 from collective.shoppingbehavior.behaviors import NamedPrice, PriceList
 
 
@@ -33,7 +32,7 @@ class TestShopper(unittest.TestCase):
         fakeLineItem = (fudge.Fake('LineItem')
                              .has_attr(item_id="foo", quantity=0))
 
-        fixture = cart.Shopper(MockCart())
+        fixture = shop.Shopper(MockCart())
         self.assertEqual('foo', fixture.add(fakeLineItem))
         self.failUnless(fixture.contains("foo"))
 
@@ -43,7 +42,7 @@ class TestShopper(unittest.TestCase):
                               .has_attr(item_id="foo", quantity=2))
         fakeLineItem2 = (fudge.Fake('LineItem')
                               .has_attr(item_id="bar", quantity=1))
-        fixture = cart.Shopper(MockCart())
+        fixture = shop.Shopper(MockCart())
         fixture.add(fakeLineItem1)
         fixture.add(fakeLineItem2)
         self.failUnless(fixture.contains("foo"))
@@ -56,7 +55,7 @@ class TestShopper(unittest.TestCase):
                               .has_attr(item_id="foo", quantity=2))
         fakeLineItem2 = (fudge.Fake('LineItem')
                               .has_attr(item_id="foo", quantity=1))
-        fixture = cart.Shopper(MockCart())
+        fixture = shop.Shopper(MockCart())
         fixture.add(fakeLineItem1)
         fixture.add(fakeLineItem2)
         self.assertEqual(1, fixture.size())
@@ -66,7 +65,7 @@ class TestShopper(unittest.TestCase):
         mock_cart = (fudge.Fake()
                           .provides('__setitem__')
                           .expects('size'))
-        fixture = cart.Shopper(mock_cart)
+        fixture = shop.Shopper(mock_cart)
         fixture.size()
 
 
@@ -75,13 +74,13 @@ class TestNamingPolicy(unittest.TestCase):
     def testConstructsLineFullIdForNamedPriceAndContext(self):
         np = NamedPrice(2.99, u"price one")
         mock_context = MockContext(id=u"søme id", title=u"")
-        naming = cart.StdNamingPolicy(np, mock_context)
+        naming = shop.StdNamingPolicy(np, mock_context)
         self.assertEqual(u"søme id-price one", naming.id())
 
     def testConstructsFullTitleForNamedPriceAndContext(self):
         np = NamedPrice(2.99, u"price one")
         mock_context = MockContext(id=u"some id", title=u"contéxt title")
-        naming = cart.StdNamingPolicy(np, mock_context)
+        naming = shop.StdNamingPolicy(np, mock_context)
         self.assertEqual(u"contéxt title (price one)", naming.title())
 
 
@@ -92,7 +91,7 @@ class TestLineItemFactory(unittest.TestCase):
         priceList = PriceList()
         priceList.append(NamedPrice(2.99, u"price one"))
         addRequest = [{"id": u'price one', "quantity": '0'}]
-        factory = cart.LineItemFactory(priceList, context, addRequest)
+        factory = shop.LineItemFactory(priceList, context, addRequest)
         lineItems = factory.create()
         self.assertEqual(0, len(lineItems),
             "Should return an empty list if quantity is 0!")
@@ -102,26 +101,26 @@ class TestLineItemFactory(unittest.TestCase):
         priceList = PriceList()
         priceList.append(NamedPrice(2.99, u"price one"))
         addRequest = [{"id": u'price one', "quantity": ' '}]
-        factory = cart.LineItemFactory(priceList, context, addRequest)
+        factory = shop.LineItemFactory(priceList, context, addRequest)
         lineItems = factory.create()
         self.assertEqual(0, len(lineItems),
             "Should return an empty list if quantity is empty!")
 
-    @fudge.patch('collective.shoppingbehavior.cart.IUUID')
+    @fudge.patch('collective.shoppingbehavior.shop.IUUID')
     def testCreatesSingleLineItem(self, IUUID):
         IUUID.expects_call()
         context = MockContext(id="some ID", title="some title")
         priceList = PriceList()
         priceList.append(NamedPrice(2.99, u"price one"))
         addRequest = [{"id": u'price one', "quantity": '2'}]
-        factory = cart.LineItemFactory(priceList, context, addRequest)
+        factory = shop.LineItemFactory(priceList, context, addRequest)
         lineItems = factory.create()
         self.assertEqual(1, len(lineItems),
             "Should return a list with one LineItem!")
         self.assertEqual(2, lineItems[0].quantity)
         self.assertEqual("some ID-price one", lineItems[0].item_id)
 
-    @fudge.patch('collective.shoppingbehavior.cart.IUUID')
+    @fudge.patch('collective.shoppingbehavior.shop.IUUID')
     def testCreatesMultipleLineItems(self, IUUID):
         IUUID.expects_call()
         context = MockContext(id="some ID", title="some title")
@@ -130,7 +129,7 @@ class TestLineItemFactory(unittest.TestCase):
                           NamedPrice(3.99, u"price two")])
         addRequest = [{"id": u'price one', "quantity": '2'},
                       {"id": u'price two', "quantity": '3'}]
-        factory = cart.LineItemFactory(priceList, context, addRequest)
+        factory = shop.LineItemFactory(priceList, context, addRequest)
         lineItems = factory.create()
         self.assertEqual(2, len(lineItems),
             "Should return a list with two LineItems!")
@@ -140,50 +139,3 @@ class TestLineItemFactory(unittest.TestCase):
         self.assertEqual(3, lineItems[1].quantity)
         self.assertEqual("some ID-price two", lineItems[1].item_id)
         self.assertEqual(3.99, lineItems[1].cost)
-
-
-class TestCartView(unittest.TestCase):
-    """ The CartAddingView instantiates a Cart object and the calls its add() method
-        with the context object and the quantity pulled from the request. These
-        tests mock out the Cart class in order to test these interactions in
-        isolation.
-    """
-
-    @fudge.patch('collective.shoppingbehavior.cart.Cart')
-    def testCartAddingViewCallsWithZeroQtyByDefault(self, Cart):
-        context = object()
-        fakeCartInstance = (fudge.Fake()
-                                 .provides('add')
-                                 .with_args(context, 0)
-                                 .returns('some id'))
-        fakeCartInstance.expects('checkout')
-        Cart.expects_call().returns(fakeCartInstance)
-        view = cart.CartAddingView(context, TestRequest())
-        view.update()
-
-    @fudge.patch('collective.shoppingbehavior.cart.Cart')
-    def testCartAddingViewCallsWithQtyFromRequest(self, Cart):
-        context = object()
-        testQty = '3'
-        request = TestRequest(form=dict(quantity=testQty))
-        fakeCartInstance = (fudge.Fake()
-                                 .provides('add')
-                                 .with_args(context, int(testQty))
-                                 .returns('some id'))
-        fakeCartInstance.expects('checkout')
-        Cart.expects_call().returns(fakeCartInstance)
-        view = cart.CartAddingView(context, request)
-        view.update()
-
-    @fudge.patch('collective.shoppingbehavior.cart.Cart')
-    def testOnlyCallsCheckoutIfAddSucceeds(self, Cart):
-        context = object()
-        testQty = '3'
-        request = TestRequest(form=dict(quantity=testQty))
-        fakeCartInstance = (fudge.Fake()
-                                 .provides('add')
-                                 .with_args(context, int(testQty))
-                                 .returns(False))
-        Cart.expects_call().returns(fakeCartInstance)
-        view = cart.CartAddingView(context, request)
-        view.update()

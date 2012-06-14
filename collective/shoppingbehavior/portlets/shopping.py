@@ -9,7 +9,8 @@ from groundwire.checkout.utils import get_cart
 
 from collective.shoppingbehavior import _
 from collective.shoppingbehavior import behaviors
-from collective.shoppingbehavior.cart import Shopper, StdNamingPolicy
+from collective.shoppingbehavior.shop import Shopper
+from collective.shoppingbehavior.shop import StdNamingPolicy
 
 ### Adding items to the cart ###
 

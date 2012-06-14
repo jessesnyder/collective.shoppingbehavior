@@ -12,7 +12,7 @@
   <include file="behaviors.zcml" />
   <include package=".portlets" />
 
-  <grok:grok package=".cart" />
+  <grok:grok package=".shop" />
 
   <genericsetup:registerProfile
       name="default"
