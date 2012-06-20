@@ -2,11 +2,9 @@ from zope import interface as zif
 from five import grok
 from zope import schema
 from plone.directives import form
-from Products.CMFPlone.utils import safe_unicode
-from collective.z3cform.datagridfield import DataGridFieldFactory, IDataGridField
 from z3c.form.interfaces import IDataConverter, NO_VALUE
-from zope.schema import getFieldsInOrder
 from z3c.form.converter import BaseDataConverter
+from collective.z3cform.datagridfield import DataGridFieldFactory, IDataGridField
 
 from collective.shoppingbehavior import _
 
@@ -98,11 +96,12 @@ class GridDataConverter(grok.MultiAdapter, BaseDataConverter):
 
     def toWidgetValue(self, value):
         rv = list()
-        for row in value:
-            d = dict()
-            for name, field in getFieldsInOrder(INamedPriceSchema):
-                d[name] = getattr(row, name)
-            rv.append(d)
+        if value is not EMPTY_PRICELIST:
+            for row in value:
+                d = dict()
+                for name, field in schema.getFieldsInOrder(INamedPriceSchema):
+                    d[name] = getattr(row, name)
+                rv.append(d)
 
         return rv
 
@@ -110,7 +109,7 @@ class GridDataConverter(grok.MultiAdapter, BaseDataConverter):
         rv = PriceList()
         for row in value:
             d = dict()
-            for name, field in getFieldsInOrder(INamedPriceSchema):
+            for name, field in schema.getFieldsInOrder(INamedPriceSchema):
                 if row.get(name, NO_VALUE) != NO_VALUE:
                     d[name] = row.get(name)
             rv.append(NamedPrice(**d))
