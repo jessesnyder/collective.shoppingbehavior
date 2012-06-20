@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest2 as unittest
+from decimal import Decimal
 import fudge
 from collective.shoppingbehavior import shop
 from collective.shoppingbehavior.behaviors import NamedPrice, PriceList
@@ -72,13 +73,13 @@ class TestShopper(unittest.TestCase):
 class TestNamingPolicy(unittest.TestCase):
 
     def testConstructsLineFullIdForNamedPriceAndContext(self):
-        np = NamedPrice(2.99, u"price one")
+        np = NamedPrice(Decimal('2.99'), u"price one")
         mock_context = MockContext(id=u"søme id", title=u"")
         naming = shop.StdNamingPolicy(np, mock_context)
         self.assertEqual(u"søme id-price one", naming.id())
 
     def testConstructsFullTitleForNamedPriceAndContext(self):
-        np = NamedPrice(2.99, u"price one")
+        np = NamedPrice(Decimal('2.99'), u"price one")
         mock_context = MockContext(id=u"some id", title=u"contéxt title")
         naming = shop.StdNamingPolicy(np, mock_context)
         self.assertEqual(u"contéxt title (price one)", naming.title())
@@ -89,7 +90,7 @@ class TestLineItemFactory(unittest.TestCase):
     def testSkipsLineItemIfQuantityIsZero(self):
         context = MockContext(id="some ID", title="some title")
         priceList = PriceList()
-        priceList.append(NamedPrice(2.99, u"price one"))
+        priceList.append(NamedPrice(Decimal('2.99'), u"price one"))
         addRequest = [{"id": u'price one', "quantity": '0'}]
         factory = shop.LineItemFactory(priceList, context, addRequest)
         lineItems = factory.create()
@@ -99,7 +100,7 @@ class TestLineItemFactory(unittest.TestCase):
     def testSkipsLineItemIfQuantityIsEmpty(self):
         context = MockContext(id="some ID", title="some title")
         priceList = PriceList()
-        priceList.append(NamedPrice(2.99, u"price one"))
+        priceList.append(NamedPrice(Decimal('2.99'), u"price one"))
         addRequest = [{"id": u'price one', "quantity": ' '}]
         factory = shop.LineItemFactory(priceList, context, addRequest)
         lineItems = factory.create()
@@ -111,7 +112,7 @@ class TestLineItemFactory(unittest.TestCase):
         IUUID.expects_call()
         context = MockContext(id="some ID", title="some title")
         priceList = PriceList()
-        priceList.append(NamedPrice(2.99, u"price one"))
+        priceList.append(NamedPrice(Decimal('2.99'), u"price one"))
         addRequest = [{"id": u'price one', "quantity": '2'}]
         factory = shop.LineItemFactory(priceList, context, addRequest)
         lineItems = factory.create()
@@ -125,8 +126,8 @@ class TestLineItemFactory(unittest.TestCase):
         IUUID.expects_call()
         context = MockContext(id="some ID", title="some title")
         priceList = PriceList()
-        priceList.extend([NamedPrice(2.99, u"price one"),
-                          NamedPrice(3.99, u"price two")])
+        priceList.extend([NamedPrice(Decimal('2.99'), u"price one"),
+                          NamedPrice(Decimal('3.99'), u"price two")])
         addRequest = [{"id": u'price one', "quantity": '2'},
                       {"id": u'price two', "quantity": '3'}]
         factory = shop.LineItemFactory(priceList, context, addRequest)
@@ -135,7 +136,16 @@ class TestLineItemFactory(unittest.TestCase):
             "Should return a list with two LineItems!")
         self.assertEqual(2, lineItems[0].quantity)
         self.assertEqual("some ID-price one", lineItems[0].item_id)
-        self.assertEqual(2.99, lineItems[0].cost)
         self.assertEqual(3, lineItems[1].quantity)
         self.assertEqual("some ID-price two", lineItems[1].item_id)
-        self.assertEqual(3.99, lineItems[1].cost)
+
+    @fudge.patch('collective.shoppingbehavior.shop.IUUID')
+    def testCastsToFloatsForCostWhenCreatingLineItem(self, IUUID):
+        IUUID.expects_call()
+        context = MockContext(id="some ID", title="some title")
+        priceList = PriceList()
+        priceList.append(NamedPrice(Decimal('2.99'), u"price one"))
+        addRequest = [{"id": u'price one', "quantity": '2'}]
+        factory = shop.LineItemFactory(priceList, context, addRequest)
+        lineItems = factory.create()
+        self.assertEqual(float(Decimal('2.99')), lineItems[0].cost)

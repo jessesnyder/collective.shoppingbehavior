@@ -61,7 +61,7 @@ class LineItemFactory(object):
             lineitem = CallbackLineItem()
             naming = self.namingPolicy(namedprice, self.context)
             lineitem.quantity = int(item['quantity'])
-            lineitem.cost = namedprice.price
+            lineitem.cost = float(namedprice.price)
             lineitem.item_id = naming.id()
             lineitem.name = naming.title()
             lineitem.description = safe_unicode(self.context.description)

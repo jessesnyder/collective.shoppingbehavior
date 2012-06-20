@@ -3,7 +3,6 @@
 import unittest2 as unittest
 from StringIO import StringIO
 from decimal import Decimal
-import fudge
 
 from zope.configuration import xmlconfig
 from zope import component
@@ -23,7 +22,7 @@ class TestPriceList(unittest.TestCase):
 
     def testCanFindASinglePriceByName(self):
         pricelist = behaviors.PriceList()
-        np = behaviors.NamedPrice(2.99, u"price one")
+        np = behaviors.NamedPrice(Decimal('2.99'), u"price one")
         pricelist.append(np)
         found = pricelist.by_name(u"price one")
         self.assertEqual(np, found)
@@ -34,15 +33,15 @@ class TestPriceList(unittest.TestCase):
 
     def testReturnsNotFoundValWhenItMisses(self):
         pricelist = behaviors.PriceList()
-        np = behaviors.NamedPrice(2.99, u"price one")
+        np = behaviors.NamedPrice(Decimal('2.99'), u"price one")
         pricelist.append(np)
         self.assertEqual(self.NAMED_PRICE_NOT_FOUND,
                             pricelist.by_name(u"other one"))
 
     def testReturnsFirstValueAddedIfThereAreMultipleMatches(self):
         pricelist = behaviors.PriceList()
-        np1 = behaviors.NamedPrice(2.99, u"price one")
-        np2 = behaviors.NamedPrice(3.99, u"price one")
+        np1 = behaviors.NamedPrice(Decimal('2.99'), u"price one")
+        np2 = behaviors.NamedPrice(Decimal('3.99'), u"price one")
         pricelist.append(np1)
         pricelist.append(np2)
         found = pricelist.by_name(u"price one")
@@ -50,7 +49,7 @@ class TestPriceList(unittest.TestCase):
 
     def testWillFindANamelessPrice(self):
         pricelist = behaviors.PriceList()
-        np = behaviors.NamedPrice(2.99)
+        np = behaviors.NamedPrice(Decimal('2.99'))
         pricelist.append(np)
         found = pricelist.by_name(u"")
         self.assertEqual(np, found)
