@@ -8,7 +8,7 @@ from collective.z3cform.datagridfield import DataGridFieldFactory, IDataGridFiel
 
 from collective.shoppingbehavior import _
 
-EMPTY_PRICELIST = None
+NO_PRICELIST = None
 
 
 class IPotentiallyPriced(zif.Interface):
@@ -74,12 +74,12 @@ class IPriced(form.Schema):
     pricelist = PriceListField(
         title=u"Price list",
         value_type=schema.Object(title=u"Price", schema=INamedPriceSchema),
-        missing_value=EMPTY_PRICELIST,
+        missing_value=NO_PRICELIST,
     )
 
     @zif.invariant
     def priceMustBeSetIfEnabled(data):
-        if data.enabled and data.pricelist == EMPTY_PRICELIST:
+        if data.enabled and not data.pricelist:
             raise zif.Invalid(
                 _(u"At least one price must be set in order for pricing to be enabled."))
 
@@ -96,7 +96,7 @@ class GridDataConverter(grok.MultiAdapter, BaseDataConverter):
 
     def toWidgetValue(self, value):
         rv = list()
-        if value is not EMPTY_PRICELIST:
+        if value is not NO_PRICELIST:
             for row in value:
                 d = dict()
                 for name, field in schema.getFieldsInOrder(INamedPriceSchema):

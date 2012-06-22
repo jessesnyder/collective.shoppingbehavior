@@ -92,8 +92,6 @@ class TestingAssignable(object):
         for e in self.enabled:
             yield component.queryUtility(IBehavior, name=e.__identifier__)
 
-EMPTY_PRICELIST = None
-
 
 class StubContext(object):
     zif.implements(IAttributeAnnotatable)
@@ -128,7 +126,7 @@ class TestPricing(unittest.TestCase):
     def testPriceListDefaultsToOurMissingValue(self):
         context = StubContext()
         priced = behaviors.IPriced(context)
-        self.assertEqual(EMPTY_PRICELIST, priced.pricelist)
+        self.assertEqual(behaviors.NO_PRICELIST, priced.pricelist)
 
     def testPriceListAcceptsNewNamedPriceObjects(self):
         context = StubContext()
@@ -144,8 +142,10 @@ class TestPricing(unittest.TestCase):
         priced = behaviors.IPriced(context)
         priced.enabled = True
         self.assertRaises(zif.Invalid, validation, priced)
+        # an empty PriceList should also fail
+        priced.pricelist = behaviors.PriceList()
+        self.assertRaises(zif.Invalid, validation, priced)
         # set a price and we're OK
         a_price = Decimal('2.99')
-        priced.pricelist = behaviors.PriceList()
         priced.pricelist.append(behaviors.NamedPrice(a_price))
         self.assertEqual(None, validation(priced))
