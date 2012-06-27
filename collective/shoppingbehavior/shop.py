@@ -12,6 +12,11 @@ from groundwire.checkout.utils import redirect_to_checkout
 from collective.shoppingbehavior import behaviors
 
 
+def getShopper():
+    # Convenience method which builds a Shopper with a Cart
+    return Shopper(get_cart())
+
+
 class ICallbackLineItem(IPayableLineItem):
     """ A line item with an after_charged() callback for use with
         groundwire.checkout
@@ -123,8 +128,8 @@ class CheckoutView(grok.View):
     grok.require('zope2.View')
 
     def update(self):
-        cart = Shopper(get_cart())
-        cart.checkout()
+        shopper = getShopper()
+        shopper.checkout()
 
     def render(self):
         return u''
@@ -139,7 +144,7 @@ class CartAddingView(grok.View):
     grok.require('zope2.View')
 
     def update(self):
-        shopper = Shopper(get_cart())
+        shopper = getShopper()
         to_add = self._lineitems(self.request.form.get('addables', []))
         successes = []
         for addition in to_add:
@@ -172,8 +177,8 @@ class CartUpdate(grok.View):
     grok.require('zope2.View')
 
     def update(self):
-        self.cart = Shopper(get_cart())
-        self.has_items = self.cart.size() > 0
+        self.shopper = getShopper()
+        self.has_items = self.shopper.size() > 0
         self.contents = self.items()
         if "update_cart" in self.request.form:
             self.update_cart(self.request.form)
@@ -189,11 +194,11 @@ class CartUpdate(grok.View):
         for qty_info in new_qtys:
             item_id = qty_info['id']
             qty = int(qty_info['quantity'])
-            self.cart.update_quantity(item_id, qty)
+            self.shopper.update_quantity(item_id, qty)
 
     def items(self):
         contents = []
-        cart_contents = self.cart.items()
+        cart_contents = self.shopper.items()
         if not cart_contents:
             return contents
         for item in cart_contents:

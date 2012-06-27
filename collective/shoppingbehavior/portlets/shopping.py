@@ -5,14 +5,11 @@ from zope.cachedescriptors.property import Lazy as lazy_property
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CMFCore.utils import getToolByName
 from plone.app.portlets.portlets import base
-from groundwire.checkout.utils import get_cart
 
 from collective.shoppingbehavior import _
 from collective.shoppingbehavior import behaviors
-from collective.shoppingbehavior.shop import Shopper
 from collective.shoppingbehavior.shop import StdNamingPolicy
-
-### Adding items to the cart ###
+from collective.shoppingbehavior.shop import getShopper
 
 
 class IAddToCartPortlet(IPortletDataProvider):
@@ -39,8 +36,8 @@ class AddToCartPortletRenderer(base.Renderer):
         return behaviors.IPriced(self.context, None)
 
     @lazy_property
-    def cart(self):
-        return Shopper(get_cart())
+    def shopper(self):
+        return getShopper()
 
     @property
     def pricelist(self):
@@ -62,7 +59,7 @@ class AddToCartPortletRenderer(base.Renderer):
     def context_is_in_cart(self):
         for namedprice in self.pricelist:
             naming = StdNamingPolicy(namedprice, self.context)
-            if self.cart.contains(naming.id()):
+            if self.shopper.contains(naming.id()):
                 return True
         return False
 
@@ -74,8 +71,6 @@ class AddToCartPortletAddForm(base.NullAddForm):
     def create(self):
         return AddToCartPortletAssignment()
 
-
-### List what's in the cart currently ###
 
 class ICartListingPortlet(IPortletDataProvider):
     """A portlet which shows what's currently in the shopping cart.
@@ -94,19 +89,19 @@ class CartListingPortletRenderer(base.Renderer):
 
     @property
     def available(self):
-        return self._isSensibleContext() and self.cart.size() > 0
+        return self._isSensibleContext() and self.shopper.size() > 0
 
     @lazy_property
-    def cart(self):
-        return Shopper(get_cart())
+    def shopper(self):
+        return getShopper()
 
     def checkout(self):
-        self.cart.checkout()
+        self.shopper.checkout()
 
     @property
     def items(self):
         contents = []
-        cart_contents = self.cart.items()
+        cart_contents = self.shopper.items()
         if not cart_contents:
             return contents
         for item in cart_contents:
