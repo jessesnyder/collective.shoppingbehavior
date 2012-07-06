@@ -193,7 +193,7 @@ class CartUpdate(grok.View):
         new_qtys = form.get('quantities', [])
         for qty_info in new_qtys:
             item_id = qty_info['id']
-            qty = int(qty_info['quantity'])
+            qty = self._as_integer(qty_info['quantity'])
             self.shopper.update_quantity(item_id, qty)
 
     def items(self):
@@ -210,6 +210,15 @@ class CartUpdate(grok.View):
             data['description'] = item[1].description
             contents.append(data)
         return contents
+
+    def _as_integer(self, value):
+        # un-castable values translate to 0
+        try:
+            qty = int(value)
+        except ValueError:
+            qty = 0
+
+        return qty
 
     @property
     def currency(self):
